@@ -1,2 +1,8 @@
 # Temporary directory
 ignored
+
+# Resources
+resources
+
+# Generated files
+*.mex*
