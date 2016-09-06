@@ -6,3 +6,7 @@ resources
 
 # Generated files
 *.mex*
+.prj
+
+# Temporary files
+*~
