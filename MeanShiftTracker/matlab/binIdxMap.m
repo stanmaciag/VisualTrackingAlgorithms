@@ -1,4 +1,4 @@
-function [b,b2] = binIdxMap(image, bins, minRange, maxRange)
+function b = binIdxMap(image, bins, minRange, maxRange)
 
     binRange = (maxRange - minRange) ./ (bins - 1);
 

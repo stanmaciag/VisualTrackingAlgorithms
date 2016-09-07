@@ -1,9 +1,10 @@
-function [currentPosition, candidateModel] = CAMShift(currentFrame, targetModel, previousPosition, windowProfileFcnHandle, maxIterations, stopThreshold)
+function [currentPosition, candidateModel] = CAMShift(currentFrame, targetModel, ...
+    previousPosition, maxIterations, stopThreshold, idxMapFcnHandle)
 
     %currentFrame = im2uint8(currentFrame);
     range = getrangefromclass(currentFrame);
     
-    currentFrameBinIdxMap = binIdxMap(double(currentFrame), targetModel.histogramBins, range(1), range(2));
+    currentFrameBinIdxMap = idxMapFcnHandle(double(currentFrame), targetModel.histogramBins, range(1), range(2));
     probabilityBackProjection = range(2) * targetModel.histogram(currentFrameBinIdxMap) / max(targetModel.histogram);
 
     currentPosition = previousPosition;

@@ -4,41 +4,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     
     // Input arguments
-    double *image, *kernel, *binsInput, *bins;
-    mwSize imageDims, kernelDims, minRange, maxRange;
+    double *image, *kernel, *binIdxArray, *binsInput;
+
+    // Output argument
+    double *normalizedWeightedHistogram;
+    
+    // Variables  
+    double *bins;
+    mwSize imageDims, kernelDims, idxArrayDims;
     mwSize imageDim[3];
-    
-    // Output arguments
-    double *weightedHistogram;
-    //uint32_T *binIdxArray;  
-    double *binIdxArray;
-    
-    // Variables
-    //double normalizationConstant = 0, normalizationConstantAcc = 0;
-    
     int i = 0, j = 0;
     
     // Check number of inputs:
-    if (nrhs != 5)
+    if (nrhs != 4)
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "5 input arguments required.");
+        mexErrMsgIdAndTxt("MeanShift:BadNInput", "4 input arguments required.");
     }
     
     // Read input arguments:
     image = (double*)mxGetPr(prhs[0]);
     kernel = (double*)mxGetPr(prhs[1]);
-    //bins = (mwSize)mxGetScalar(prhs[2]);
-    binsInput = (double*)mxGetPr(prhs[2]);
-    //minRange = (mwSize)mxGetScalar(prhs[3]);
-    //maxRange = (mwSize)mxGetScalar(prhs[4]);
-    minRange = (double)mxGetScalar(prhs[3]);
-    maxRange = (double)mxGetScalar(prhs[4]);
-    
+    binIdxArray = (double*)mxGetPr(prhs[2]);
+    binsInput = (double*)mxGetPr(prhs[3]);
+
     imageDims = mxGetNumberOfDimensions(prhs[0]);
     
     if (imageDims != 2 && imageDims != 3)
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input image - must be represented as 2 or 3 dimensional array.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectDim", "Invalid input image - must be represented as 2 or 3 dimensional array.");
     }
    
     imageDim[0] = mxGetDimensions(prhs[0])[0];
@@ -57,18 +50,32 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     if (kernelDims != 2)
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input kernel - must be 2 dimensional array.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectDim", "Invalid input kernel - must be 2 dimensional array.");
     }
     
     const mwSize *kernelDim = mxGetDimensions(prhs[1]);
     
     if (kernelDim[0] != imageDim[0] || kernelDim[1] != imageDim[1])
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input kernel - must be the same size as input image.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectSize", "Invalid input kernel - must be the same size as input image.");
+    }
+    
+    idxArrayDims = mxGetNumberOfDimensions(prhs[2]);
+    
+    if (idxArrayDims != 2)
+    {
+        mexErrMsgIdAndTxt("MeanShift:IncorrectDim", "Invalid input bin index array - must be 2 dimensional array.");
+    }
+    
+    const mwSize *idxArrayDim = mxGetDimensions(prhs[2]);
+    
+    if (idxArrayDim[0] != imageDim[0] || idxArrayDim[1] != imageDim[1])
+    {
+        mexErrMsgIdAndTxt("MeanShift:IncorrectSize", "Invalid input bin index array - must be the same size as input image.");
     }
     
     bins = (double*)mxCalloc(imageDim[2],sizeof(double));
-    const mwSize *binsDim = mxGetDimensions(prhs[2]);
+    const mwSize *binsDim = mxGetDimensions(prhs[3]);
     
     if (binsDim[0] == 1 && binsDim[1] == 1)
     {
@@ -86,7 +93,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     else
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input bins sizes - must be a scalar or vector which length equals to number of image channels.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectSize", "Invalid input bins sizes - must be a scalar or vector which length equals to number of image channels.");
     }
     
     // Compute histogram size 
@@ -101,16 +108,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     // Allocate output argument array and initialize all values with 0:
     plhs[0] = mxCreateDoubleMatrix(outputSize, 1, mxREAL);
-    weightedHistogram = mxGetPr(plhs[0]);
+    normalizedWeightedHistogram = (double*)mxGetPr(plhs[0]);
     
-    plhs[1] = mxCreateDoubleMatrix(imageDim[0], imageDim[1], mxREAL);
-    binIdxArray = (double*)mxGetData(plhs[1]);
-
+    computeNormalizedWeightedHistogram(binIdxArray, kernel, imageDim, normalizedWeightedHistogram);
     
-    computeBinArray(image, bins, imageDim, minRange, maxRange, binIdxArray);
-    
-    computeWeightedHistogram(binIdxArray, kernel, imageDim, weightedHistogram);
-
     mxFree(bins);
     
     return;

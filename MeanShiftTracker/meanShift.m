@@ -1,7 +1,9 @@
 function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentFrame, previousPosition, ...
-targetModel, windowBandwidth, windowProfileFcnHandle, maxIterations, stopThreshold)
+    targetModel, windowBandwidth, windowProfileFcnHandle, maxIterations, stopThreshold, idxMapFcnHandle, ...
+    histogramFcnHandle, pixelWeightsFcnHandle)
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Kernel-based object tracking
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Real-time tracking of non-rigid objects using mean shift
+    
     range = getrangefromclass(currentFrame);
     
     [kernelX, kernelY] = meshgrid(-windowBandwidth : 1/targetModel.horizontalRadious : ...
@@ -29,10 +31,12 @@ targetModel, windowBandwidth, windowProfileFcnHandle, maxIterations, stopThresho
         roi = zeros(roiMaxY - roiMinY + 1, roiMaxX - roiMinX + 1, size(currentFrame,3));    
         roi(roiMinYPad + 1 : size(roi,1) - roiMaxYPad, roiMinXPad + 1 : size(roi,2) - roiMaxXPad, :) = double(currentFrame(roiMinY + roiMinYPad : roiMaxY - roiMaxYPad, roiMinX + roiMinXPad : roiMaxX - roiMaxXPad,:));
         
-        [candidateHistogram, candidateIdxMap] = mexNormalizedWeightedHistogram(roi, kernel, targetModel.histogramBins, range(1), range(2));
+        %[candidateHistogram, candidateIdxMap] = mexNormalizedWeightedHistogram(roi, kernel, targetModel.histogramBins, range(1), range(2));
         %[candidateHistogram, candidateIdxMap] = computeWeightedHistogram(roi, kernel, [16; 16; 16], range(1), range(2));
+        candidateIdxMap = idxMapFcnHandle(roi, targetModel.histogramBins,  range(1), range(2));
+        candidateHistogram = histogramFcnHandle(roi, kernel, candidateIdxMap, targetModel.histogramBins);
         
-        weightsMap = mexPixelWeights(targetModel.histogram, candidateHistogram, kernel, candidateIdxMap);
+        weightsMap = pixelWeightsFcnHandle(targetModel.histogram, candidateHistogram, kernel, candidateIdxMap);
         
         weightsMapSum = sum(sum(weightsMap));
         

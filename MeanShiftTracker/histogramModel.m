@@ -1,4 +1,5 @@
-function model = weightetTargetModel(image, windowProfileFcnHandle, histogramBins)
+function model = histogramModel(image, windowProfileFcnHandle, histogramBins, ...
+idxMapFcnHandle, histogramFcnHandle)
 
     model.verticalRadious = ceil(size(image,1) / 2) - 1;
     model.horizontalRadious = ceil(size(image,2) / 2) - 1;
@@ -18,7 +19,8 @@ function model = weightetTargetModel(image, windowProfileFcnHandle, histogramBin
     end
     
     range = getrangefromclass(image);
-    [model.histogram, model.binIdxMap] = mexWeightedHistogram(double(image), kernel, histogramBins, range(1), range(2));
+    model.binIdxMap = idxMapFcnHandle(double(image), histogramBins,  range(1), range(2));
+    model.histogram = histogramFcnHandle(double(image), kernel, model.binIdxMap, histogramBins);
     model.histogramBins = histogramBins;
     
 end

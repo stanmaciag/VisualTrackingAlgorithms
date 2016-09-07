@@ -1,13 +1,11 @@
 #include <math.h>
-#include "mex.h"
+#include <mex.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     
     // Input arguments
-    double *targetHistogram, *candidateHistogram, *kernel;
-    //uint32_T *binIdxMap;
-    double *binIdxMap;
+    double *targetHistogram, *candidateHistogram, *kernel, *binIdxMap;
     
     // Output argument
     double *weightsMap;
@@ -15,7 +13,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // Check number of inputs:
     if (nrhs != 4)
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "4 input arguments required.");
+        mexErrMsgIdAndTxt("MeanShift:BadNInput", "4 input arguments required.");
     }
     
     // Read input arguments:
@@ -29,14 +27,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     if (targetHistogramDim != candidateHistogramDim)
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input - inconsistent histgrams size.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectSize", "Invalid input - inconsistent histgrams size.");
     }
     
     mwSize kernelDims = mxGetNumberOfDimensions(prhs[2]);
     
     if (kernelDims != 2)
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input kernel - must be a matrix.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectDim", "Invalid input kernel - must be a matrix.");
     }
     
     const mwSize *kernelDim = mxGetDimensions(prhs[2]);
@@ -45,14 +43,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     if (binIdxMapDims != 2)
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input bin index map - must be a matrix.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectDim", "Invalid input bin index map - must be a matrix.");
     }
     
     const mwSize *binIdxMapDim = mxGetDimensions(prhs[3]);
     
     if (kernelDim[0] != binIdxMapDim[0] || kernelDim[1] != binIdxMapDim[1])
     {
-        mexErrMsgIdAndTxt("MeanShift:Func:BadNInput", "Invalid input - inconsistent size of bin index map and kernel.");
+        mexErrMsgIdAndTxt("MeanShift:IncorrectSize", "Invalid input - inconsistent size of bin index map and kernel.");
     }   
         
     plhs[0] = mxCreateDoubleMatrix(binIdxMapDim[0], binIdxMapDim[1], mxREAL);
@@ -68,7 +66,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             
             if (kernel[i + j * binIdxMapDim[0]] > 0)
             {
-                //weightsMap[i + j * binIdxMapDim[0]] = sqrt(targetHistogram[binIdxMap[i + j * binIdxMapDim[0]] - 1] / candidateHistogram[binIdxMap[i + j * binIdxMapDim[0]] - 1]);
+                
                 weightsMap[i + j * binIdxMapDim[0]] = sqrt(targetHistogram[(unsigned)binIdxMap[i + j * binIdxMapDim[0]] - 1] / candidateHistogram[(unsigned)binIdxMap[i + j * binIdxMapDim[0]] - 1]);
             
             }
