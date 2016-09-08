@@ -29,8 +29,8 @@ roi = currentFrameHSV(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) 
 
 %%
 
-clear targetModel;
-targetModel = histogramModel(roi, @epanechnikovKernelProfile, bins, idxMapFcnHandle, histogramFcnHandle);
+%clear targetModel;
+targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins, idxMapFcnHandle, histogramFcnHandle);
 targetPosition = [round(roiRect(2) + roiRect(4)/2), round(roiRect(1) + roiRect(3)/2)];
 
 %%
@@ -56,13 +56,13 @@ while ~isDone(videoFileReader)
     newWindowBandwidth = [windowBandwidth, windowBandwidth + windowDelta, windowBandwidth - windowDelta];
 
     [currentPosition1, similarityCoeff1, candidateModel1] = meanShift(currentFrameHSV, targetPosition, ...
-        targetModel, newWindowBandwidth(1), @epanechnikovKernelProfile, maxIterations, threshold, ...
+        targetModel, newWindowBandwidth(1), @epanechnikovProfile, maxIterations, threshold, ...
         idxMapFcnHandle, histogramFcnHandle, pixelWeightsFcnHandle);
     [currentPosition2, similarityCoeff2, candidateModel2] = meanShift(currentFrameHSV, targetPosition, ...
-        targetModel, newWindowBandwidth(2), @epanechnikovKernelProfile, maxIterations, threshold, ...
+        targetModel, newWindowBandwidth(2), @epanechnikovProfile, maxIterations, threshold, ...
         idxMapFcnHandle, histogramFcnHandle, pixelWeightsFcnHandle);
     [currentPosition3, similarityCoeff3, candidateModel3] = meanShift(currentFrameHSV, targetPosition, ...
-        targetModel, newWindowBandwidth(3), @epanechnikovKernelProfile, maxIterations, threshold, ...
+        targetModel, newWindowBandwidth(3), @epanechnikovProfile, maxIterations, threshold, ...
         idxMapFcnHandle, histogramFcnHandle, pixelWeightsFcnHandle);
     
     [maxSimilarityCoeff, maxIdx] = max([similarityCoeff1, similarityCoeff2, similarityCoeff3]);
@@ -107,8 +107,8 @@ while ~isDone(videoFileReader)
         roiRect(3) * windowBandwidth, roiRect(4) * windowBandwidth]; 
     
     %videoFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');
-    videoFrame = insertShape(currentFrame, 'Rectangle', boundingRect, 'Color', 'red');
-    step(videoPlayer, videoFrame);
+    currentFrame = insertShape(currentFrame, 'Rectangle', boundingRect, 'Color', 'red');
+    step(videoPlayer, currentFrame);
     
     
     
