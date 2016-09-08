@@ -1,4 +1,4 @@
-function k_e = epanechnikovKernelProfile(x)
+function k_e = epanechnikovProfile(x)
 
     k_e = zeros(size(x), class(x));
     

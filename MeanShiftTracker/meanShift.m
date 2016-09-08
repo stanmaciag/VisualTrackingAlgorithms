@@ -1,5 +1,5 @@
 function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentFrame, previousPosition, ...
-    targetModel, windowBandwidth, windowProfileFcnHandle, maxIterations, stopThreshold, idxMapFcnHandle, ...
+    targetModel, windowBandwidth, windowProfileFcnHandle, windowDProfileFcnHandle, maxIterations, stopThreshold, idxMapFcnHandle, ...
     histogramFcnHandle, pixelWeightsFcnHandle)
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Kernel-based object tracking
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Real-time tracking of non-rigid objects using mean shift
@@ -11,6 +11,7 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
     [kernelX, kernelY] = meshgrid(-windowBandwidth : 1/targetModel.horizontalRadious : ...
         windowBandwidth, -windowBandwidth : 1/targetModel.verticalRadious : windowBandwidth);
     kernel = windowProfileFcnHandle(sqrt(((kernelX/windowBandwidth).^2 + (kernelY/windowBandwidth).^2)).^2);
+    kernelDerivative = windowDProfileFcnHandle(sqrt(((kernelX/windowBandwidth).^2 + (kernelY/windowBandwidth).^2)).^2);
     
     % Initialize position in current frame with previous position
     currentPosition = previousPosition;
@@ -49,13 +50,13 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
         weightsMap = pixelWeightsFcnHandle(targetModel.histogram, candidateHistogram, kernel, candidateIdxMap);
         
         % Calculate sum of weights
-        weightsMapSum = sum(sum(weightsMap));
+        weightsMapSum = sum(sum(weightsMap.*-kernelDerivative));
         
         % Get grid of global ROI coordinates
         [roiXgrid, roiYgrid] = meshgrid(roiMinX:roiMaxX, roiMinY:roiMaxY);
         
         % Calculate new position
-        newPosition = round([sum(sum(roiYgrid.*weightsMap))/weightsMapSum, sum(sum(roiXgrid.*weightsMap))/weightsMapSum]);
+        newPosition = round([sum(sum(roiYgrid.*weightsMap.*-kernelDerivative))/weightsMapSum, sum(sum(roiXgrid.*weightsMap.*-kernelDerivative))/weightsMapSum]);
         
         % Check convergence condition - stop if position shift is smaller
         % than given threshold
