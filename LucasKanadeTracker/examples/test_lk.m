@@ -1,6 +1,6 @@
-clear all;
+%clear all;
 close all;
-clc;
+%clc;
 
 %%
 
@@ -16,6 +16,15 @@ hold on;
 rectangle('Position',roiRect);
 
 roi = currentFrame(roiRect(1):roiRect(1) + roiRect(3), roiRect(2):roiRect(2) + roiRect(4));
+
+windowRadiousY = 5;
+windowRadiousX = 5;
+maxIterations = 5;
+stopThreshold = 0.5;
+pyramidDepth = 3;
+%engineFcnHandle = @forwardAdditiveLK;
+engineFcnHandle = @inverseCompostionalLK;
+weightingKernelFcnHandle = @gaussianKernel;
 
 %%
 
@@ -44,10 +53,9 @@ while ~isDone(videoFileReader)
 
     tic;
     
-    %flow = forwardAdditiveLK(previousFrame, currentFrame, features, windowRadiousY, windowRadiousX, 5, 0.5, @gaussianKernel, initialOpticalFlow);
-    flow = pyramidalLucasKanade(previousFrame, currentFrame, features, windowRadiousY, windowRadiousX, 5, 0.5, 3, @forwardAdditiveLK, @gaussianKernel);
-    %flow = inverseCompostionalLK(previousFrame, currentFrame, features, windowRadiousY, windowRadiousX, 5, 0.5, @gaussianKernel, initialOpticalFlow);
-    %flow = pyramidalLucasKanade(previousFrame, currentFrame, features, windowRadiousY, windowRadiousX, 5, 0.5, 3, @inverseCompostionalLK, @gaussianKernel);
+    flow = pyramidalLucasKanade(previousFrame, currentFrame, features, windowRadiousY, ...
+        windowRadiousX, maxIterations, stopThreshold, pyramidDepth, engineFcnHandle, weightingKernelFcnHandle);
+    
     features = features + flow;
     
     currentTime = toc;

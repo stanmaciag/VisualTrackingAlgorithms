@@ -1,48 +1,14 @@
 function opticalFlow = inverseCompostionalLK(previousFrame, currentFrame, ...
     pointsToTrack, windowRadiousY, windowRadiousX, maxIterations, ...
-    stopThreshold, weightingKernelFcnHandle, initialOpticalFlow)
+    stopThreshold, weightingKernel, initialOpticalFlow)
     % References
     % ----------
     % 1. Baker, S. & Matthews, I. Lucas-Kanade 20 Years On: A Unifying 
     % Framework International Journal of Computer Vision, 2004, 56, 221-255
 
-    % Use uniform kernlen if another not given
-    if nargin < 8
-        
-        weightingKernelFcnHandle = @uniformKernel;
-        
-    end
-    
-    % Zero initial flow if another not given
-    if nargin < 9
-       
-        initialOpticalFlow = zeros(size(pointsToTrack));
-        
-    end
-    
-    % Compute kernel for current window
-    [kernelX, kernelY] = meshgrid(1 : 2 * windowRadiousX + 1, 1 : 2 * windowRadiousY + 1);
-    weightingKernel = weightingKernelFcnHandle(kernelY, kernelX);
-   
-    % Pad images with zero-value pixels, pad size is defined
-    % by search window size - prevent from outreaching image boundaries for
-    % every point inside image
-    initExtendedCurrentFrame = zeros(size(currentFrame,1) + 2 * windowRadiousY + 2, size(currentFrame,2) + 2 * windowRadiousX + 2);
-    initExtendedPreviousFrame = zeros(size(previousFrame,1) + 2 * windowRadiousY + 2, size(previousFrame,2) + 2 * windowRadiousX + 2);
-    initExtendedCurrentFrame(windowRadiousY + 1 : size(currentFrame,1) + windowRadiousY, ...
-        windowRadiousX + 1 : size(currentFrame,2) + windowRadiousX) = currentFrame;
-    currentFrame = initExtendedCurrentFrame;
-    initExtendedPreviousFrame(windowRadiousY + 1 : size(previousFrame,1) + windowRadiousY, ...
-        windowRadiousX + 1 : size(previousFrame,2) + windowRadiousX) = previousFrame;
-    previousFrame = initExtendedPreviousFrame;
- 
     % Compute spatial gradients of previous frame
-    [gradientX, gradientY] = gradient(previous);
+    [gradientX, gradientY] = gradient(previousFrame);
     
-    % Shift points coordinates - reconcile with padded gradient matrices
-    pointsToTrack(:,2) = pointsToTrack(:,2) + windowRadiousY + 1;
-    pointsToTrack(:,1) = pointsToTrack(:,1) + windowRadiousX + 1;
-
     % Initialize optical flow vectors
     opticalFlow = zeros(size(pointsToTrack));
     
@@ -61,8 +27,8 @@ function opticalFlow = inverseCompostionalLK(previousFrame, currentFrame, ...
         [windowPixelsX, windowPixelsY] = meshgrid(windowXRangeMin : windowXRangeMax, windowYRangeMin : windowYRangeMax); 
         
         % Get spatial gradient for current window
-        gradientYWindow = bilinearInterpolate(templateGradientY, windowPixelsY, windowPixelsX);
-        gradientXWindow = bilinearInterpolate(templateGradientX, windowPixelsY, windowPixelsX);
+        gradientYWindow = bilinearInterpolate(gradientY, windowPixelsY, windowPixelsX);
+        gradientXWindow = bilinearInterpolate(gradientX, windowPixelsY, windowPixelsX);
         
         % Get template for current window
         templateWindow = bilinearInterpolate(previousFrame, windowPixelsY, windowPixelsX);
@@ -82,11 +48,11 @@ function opticalFlow = inverseCompostionalLK(previousFrame, currentFrame, ...
                    windowPixelsX + currentFlow(1) + initialOpticalFlow(currentPointIdx, 1));
 
             % Compute error image for current window
-            gradientTWindow = windowWarped - templateWindow;
+            errorImage = windowWarped - templateWindow;
             
             % Update steppest descent parameters
-            steppestDescentUpdate = [sum(sum(gradientXWindow .* gradientTWindow .* weightingKernel)); ... 
-                    sum(sum(gradientYWindow .* gradientTWindow .* weightingKernel))];
+            steppestDescentUpdate = [sum(sum(gradientXWindow .* errorImage .* weightingKernel)); ... 
+                    sum(sum(gradientYWindow .* errorImage .* weightingKernel))];
 
             % Compute optical flow change
             flowChange = hessian \ steppestDescentUpdate;

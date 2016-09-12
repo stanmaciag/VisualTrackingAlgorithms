@@ -1,0 +1,14 @@
+MEX {
+	global:
+		mexFunction;
+		emlrtMexFcnProperties;
+		inverseCompostionalLK;
+		emxEnsureCapacity;
+		emxFree_real_T;
+		emxInit_real_T;
+		inverseCompostionalLK_initialize;
+		inverseCompostionalLK_terminate;
+		inverseCompostionalLK_atexit;
+	local:
+		*;
+};

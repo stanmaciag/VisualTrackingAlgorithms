@@ -1,0 +1,451 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Code Generation Report</title>
+<link rel="stylesheet" type="text/css" href="resources/eml_report.css" />
+<link rel="stylesheet" type="text/css" href="resources/jQuery/ui.resizable.css" />
+<link rel="stylesheet" type="text/css" href="index.css" />
+
+<script type="text/javascript" src="resources/jQuery/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="resources/jQuery/jquery-ui-1.7.custom.min.js"></script>
+<script type="text/javascript" src="resources/jQuery/jquery.tablesorter.mod.js"></script>
+<script type="text/javascript" src="resources/jQuery/jquery.hotkeys-0.7.8.js"></script>
+<script type="text/javascript" src="resources/eml_report_interactions.js"></script>
+<script type="text/javascript" src="resources/eml_report_layout.js"></script>
+<script type="text/javascript" src="rtwshrink.js"></script>
+<script type="text/javascript">
+var localizedMessages = {
+    callSelectPrompt: "Select a function call:",
+    callSelectSource: "Calls from this function",
+    callSelectTarget: "Calls to this function",
+    infoForExpression: "Information for the selected expression:",
+    infoForVarType: "Information for the selected variable:",
+    infoForVarConst: "Information for the selected compile-time constant:",
+    infoForVarNone: "This variable does not have information associated with it.",
+    infoForFilter: "Matched {0}/{1} functions, {2}/{3} methods",
+    autoExtrinsicCall: "Only supported within the MATLAB environment."
+};
+var keyBindings = {
+        selectMCodeTab: "Ctrl+m",
+    selectCallStackTab: "Ctrl+k",
+        selectCCodeTab: "Ctrl+c",
+       selectReportTab: "Ctrl+r",
+     selectCenterPanel: "Ctrl+w",
+      selectSummaryTab: "Ctrl+s",
+     selectMessagesTab: "Ctrl+a",
+    selectWatchListTab: "Ctrl+v",
+     selectBuildLogTab: "Ctrl+t"
+};
+var functionInfoTable = {
+ MATLABcode1: "inverseCompostionalLK1_mcode.html",
+ fpath1: "/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/inverseCompostionalLK.m",
+ lines1: [1, 1, 80],
+ watch1: "inverseCompostionalLK1_watch.html",
+ title1: "Function: <span class='functionname'><a title='/home/maciag/Dropbox/Praca&nbsp;magisterska/git/matlab/LucasKanadeTracker/inverseCompostionalLK.m' class='functionlink' href=\"matlab: open('/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/inverseCompostionalLK.m')\">inverseCompostionalLK</a></span>",
+ tcall1: [  ],
+ scall1: [ [ "From line 30 to bilinearInterpolate", "151#srcline1" ], [ "From line 31 to bilinearInterpolate", "151#srcline1" ], [ "From line 34 to bilinearInterpolate", "151#srcline1" ], [ "From line 46 to bilinearInterpolate", "151#srcline1" ] ],
+ MATLABcode151: "bilinearInterpolate151_mcode.html",
+ fpath151: "/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/bilinearInterpolate.m",
+ lines151: [1, 1, 16],
+ watch151: "bilinearInterpolate151_watch.html",
+ title151: "Function: <span class='functionname'><a title='/home/maciag/Dropbox/Praca&nbsp;magisterska/git/matlab/LucasKanadeTracker/bilinearInterpolate.m' class='functionlink' href=\"matlab: open('/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/bilinearInterpolate.m')\">bilinearInterpolate</a></span>",
+ tcall151: [ [ "From inverseCompostionalLK line 30", "1#F151N2:B101" ], [ "From inverseCompostionalLK line 31", "1#F151N2:B109" ], [ "From inverseCompostionalLK line 34", "1#F151N2:B117" ], [ "From inverseCompostionalLK line 46", "1#F151N2:B177" ] ],
+ scall151: [  ],
+ rootFcnID: "1",
+ firstPage: "1",
+ htmlRoot: "/home/maciag/Dropbox/Praca%20magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK/html/"
+};
+var scriptInfoTable = {
+ fpath1: "/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/inverseCompostionalLK.m",
+ fpath2: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/iscolumn.m",
+ fpath3: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/prodsize.m",
+ fpath4: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/indexMinus.m",
+ fpath5: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/indexTimes.m",
+ fpath6: "/opt/MATLAB/R2016a/toolbox/eml/lib/fixedpoint/isnumerictype.m",
+ fpath7: "/opt/MATLAB/R2016a/toolbox/eml/lib/fixedpoint/isfi.m",
+ fpath8: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/intmax.m",
+ fpath9: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/intmin.m",
+ fpath10: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/eml/eml_int_forloop_overflow_check.m",
+ fpath11: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/indexPlus.m",
+ fpath12: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/isBuiltInNumeric.m",
+ fpath13: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/scalexpCompatible.m",
+ fpath14: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/div.m",
+ fpath15: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/ops/rdivide.m",
+ fpath16: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/ops/mrdivide.p",
+ fpath17: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/datafun/gradient.m",
+ fpath18: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+scalar/floor.m",
+ fpath19: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/applyScalarFunctionInPlace.m",
+ fpath20: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elfun/floor.m",
+ fpath21: "/opt/MATLAB/R2016a/toolbox/shared/coder/coder/+coder/+internal/narginchk.m",
+ fpath22: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/scalarEg.m",
+ fpath23: "/opt/MATLAB/R2016a/toolbox/eml/lib/fixedpoint/isfimath.m",
+ fpath24: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/scalexpAllocNoCheck.m",
+ fpath25: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/scalexpAlloc.m",
+ fpath26: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/minOrMax.m",
+ fpath27: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/datafun/max.m",
+ fpath28: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/isinf.m",
+ fpath29: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/isnan.m",
+ fpath30: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/isfinite.m",
+ fpath31: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/floatModel.m",
+ fpath32: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/flintmax.m",
+ fpath33: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+scalar/abs.m",
+ fpath34: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/applyScalarFunction.m",
+ fpath35: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elfun/abs.m",
+ fpath36: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/ops/colon.m",
+ fpath37: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/private/eml_realmax.m",
+ fpath38: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/realmax.m",
+ fpath39: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/isFloatClass.m",
+ fpath40: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/private/eml_eps.m",
+ fpath41: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/eps.m",
+ fpath42: "/opt/MATLAB/R2016a/toolbox/shared/coder/coder/+coder/+internal/indexIntRelop.m",
+ fpath43: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/indexDivide.m",
+ fpath44: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/assertValidSizeArg.m",
+ fpath45: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/isIntegerClass.m",
+ fpath46: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/repmat.m",
+ fpath47: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/meshgrid.m",
+ fpath48: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/useParforConst.m",
+ fpath49: "/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/bilinearInterpolate.m",
+ fpath50: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/constNonSingletonDim.m",
+ fpath51: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/datafun/private/process_sumprod_inputs.m",
+ fpath52: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/private/eml_isequal_core.m",
+ fpath53: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/isequal.m",
+ fpath54: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/datafun/private/combine_vector_elements.m",
+ fpath55: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/datafun/private/sumprod.m",
+ fpath56: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/datafun/sum.m",
+ fpath57: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+refblas/xcabs1.m",
+ fpath58: "/opt/MATLAB/R2016a/toolbox/shared/coder/coder/+coder/+internal/warning.m",
+ fpath59: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/lusolve.m",
+ fpath60: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/ops/mldivide.p",
+ fpath61: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+blas/inline.m",
+ fpath62: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+blas/use_refblas.m",
+ fpath63: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+blas/threshold.m",
+ fpath64: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+blas/xnrm2.m",
+ fpath65: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/private/eml_realmin.m",
+ fpath66: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/elmat/realmin.m",
+ fpath67: "/opt/MATLAB/R2016a/toolbox/eml/eml/+coder/+internal/+refblas/xnrm2.m",
+ fpath68: "/opt/MATLAB/R2016a/toolbox/eml/lib/matlab/matfun/norm.m"
+};
+</script>
+</head>
+<body>
+
+<div class="west">
+<ul class="ui-tabs-nav">
+<li class="ui-tabs-nav-item ui-tabs-selected"><span class="tab-link" id="MATLABcode"><span>MATLAB code</span></span></li>
+<li class="ui-tabs-nav-item"><span class="tab-link" id="callstack"><span>Call stack</span></span></li>
+<li class="ui-tabs-nav-item"><span class="tab-link" id="ccode"><span>C code</span></span></li>
+</ul>
+<div id="MATLABcodebody" class="ui-tabs-panel">
+<!-- Begin Filter -->
+<div class="grayline methodset" onclick="filterClick(event);">
+<a class="collapsed">Filter</a>
+</div>
+<div id="filterbody" class="hidden">
+<table class="myfunc-filter-tbl">
+<tr>
+<td title="Use this filter to display only functions and methods that contain variables or expressions with the specified attributes." colspan="2" class="checkbox">
+<div class="myfunc-filterby-chk"><input type="checkbox" class="filterenable" />
+<div class="filter-enable-lbl">Filter functions and methods</div></div></td></tr><tr>
+<td class="label"><div class="myfunc-filterby-lbl">Filter by:</div></td>
+<td class="select">
+<div class="filters">
+<select class="myfunc-filterby">
+<option id="size">Size</option>
+<option id="complex">Complexity</option>
+<option id="class">Class</option>
+</select>
+</div>
+</td>
+</tr>
+
+<tr>
+<td class="label"><div class="myfunc-filterstr-lbl">Filter:</div></td>
+<td class="input"><div>
+
+<div class="size">
+<select class="myfunc-filter size">
+<option value="1">1 x 1</option>
+<option value="1">2 x 1</option>
+<option value="1">2 x 2</option>
+<option value="1"><b>:</b>? x 2</option>
+<option value="1 151"><b>:</b>? x <b>:</b>?</option>
+</select>
+</div>
+
+<div class="complex">
+<select class="myfunc-filter complex">
+<option value="">Complex values</option>
+<option value="1 151">Real values</option>
+</select>
+</div>
+<!-- Begin Class Filter -->
+<div class="class">
+<select class="myfunc-filter class">
+<option value="1 151">double</option>
+</select>
+</div>
+<!-- End Class Filter -->
+</div>
+</td>
+</tr>
+</table>
+<div class="myfunc-count"></div>
+</div>
+<!-- End Filter -->
+<div class="grayline methodset" onmouseover="callTreeMouseOver(event);" onmouseout="callTreeMouseOut(event);" onclick="functionSetClick(event);">
+<a class="expanded">Functions</a>
+</div>
+<!-- Begin Function Tree -->
+<div id="functiontreebody">
+<div class="functionwrapper" onmouseover="callTreeMouseOver(event);" onmouseout="callTreeMouseOut(event);" onclick="functionTreeClick(event);">
+<ol class="tree">
+<!-- Begin Function Tree Roots -->
+<li class="leaf  passed"><a href="#" class="fcn " id="F151N2:F1">bilinearInterpolate</a></li>
+<li class="leaf  passed"><a href="#" class="fcn " id="F1N6:F2">inverseCompostionalLK</a></li>
+<!-- End Function Tree Roots -->
+</ol>
+<!-- Function Tree Nodes -->
+<div class="functiontreenodes hidden">
+</div>
+<!-- End Function Tree Nodes -->
+</div>
+</div>
+<!-- End Function Tree -->
+</div>
+<!-- Begin Call Tree -->
+<div id="callstackbody" class="ui-tabs-panel hidden">
+<div class="treewrapper" onmouseover="callTreeMouseOver(event);" onmouseout="callTreeMouseOut(event);" onclick="callTreeClick(event);">
+<ol class="tree">
+<!-- Call Tree Root -->
+<li class="node collapsed passed"><a href="#" class="fcn " id="F1N6:L1">inverseCompostionalLK</a>
+<ul>
+<li class="leaf passed"><a href="#" class="fcn " id="F151N2:L2">bilinearInterpolate</a></li>
+</ul>
+</li>
+</ol>
+<!-- Call Tree Nodes -->
+<div class="callstacknodes hidden">
+<ol class="callstacknode" id="callstacknode1">
+
+<li class="node collapsed passed"><a href="#" class="fcn " id="F1N6:l1">inverseCompostionalLK</a>
+<ul>
+<li class="leaf passed"><a href="#" class="fcn " id="F151N2:l2">bilinearInterpolate</a></li>
+</ul>
+</li>
+</ol>
+<ol class="callstacknode" id="callstacknode151">
+
+<li class="leaf passed"><a href="#" class="fcn " id="F151N2:l3">bilinearInterpolate</a>
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+<!-- End Call Tree -->
+<!-- Begin C Code -->
+<div id="ccodebody" class="ui-tabs-panel hidden">
+<div class="grayline methodset" onclick="ccodeClick(event,1);">
+<a class="expanded">Target Source Files</a>
+</div>
+<!-- Begin C Code List -->
+<div id="ccodelistbody1" class="visible">
+<table class="myfunc-list" cellspacing="0" cellpadding="0" onclick="cFileClickWithMexWarning(event);">
+<tbody>
+<tr class="ccode" id="assertValidSizeArg_c.html"><td class="ccode"><a href="#">assertValidSizeArg.c</a></td></tr>
+<tr class="ccode" id="assertValidSizeArg_h.html"><td class="ccode"><a href="#">assertValidSizeArg.h</a></td></tr>
+<tr class="ccode" id="bilinearInterpolate_c.html"><td class="ccode"><a href="#">bilinearInterpolate.c</a></td></tr>
+<tr class="ccode" id="bilinearInterpolate_h.html"><td class="ccode"><a href="#">bilinearInterpolate.h</a></td></tr>
+<tr class="ccode" id="eml_int_forloop_overflow_check_c.html"><td class="ccode"><a href="#">eml_int_forloop_overflow_check.c</a></td></tr>
+<tr class="ccode" id="eml_int_forloop_overflow_check_h.html"><td class="ccode"><a href="#">eml_int_forloop_overflow_check.h</a></td></tr>
+<tr class="ccode" id="floor_c.html"><td class="ccode"><a href="#">floor.c</a></td></tr>
+<tr class="ccode" id="floor_h.html"><td class="ccode"><a href="#">floor.h</a></td></tr>
+<tr class="ccode" id="gradient_c.html"><td class="ccode"><a href="#">gradient.c</a></td></tr>
+<tr class="ccode" id="gradient_h.html"><td class="ccode"><a href="#">gradient.h</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_c.html"><td class="ccode"><a href="#">inverseCompostionalLK.c</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_h.html"><td class="ccode"><a href="#">inverseCompostionalLK.h</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_data_c.html"><td class="ccode"><a href="#">inverseCompostionalLK_data.c</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_data_h.html"><td class="ccode"><a href="#">inverseCompostionalLK_data.h</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_emxutil_c.html"><td class="ccode"><a href="#">inverseCompostionalLK_emxutil.c</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_emxutil_h.html"><td class="ccode"><a href="#">inverseCompostionalLK_emxutil.h</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_initialize_c.html"><td class="ccode"><a href="#">inverseCompostionalLK_initialize.c</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_initialize_h.html"><td class="ccode"><a href="#">inverseCompostionalLK_initialize.h</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_terminate_c.html"><td class="ccode"><a href="#">inverseCompostionalLK_terminate.c</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_terminate_h.html"><td class="ccode"><a href="#">inverseCompostionalLK_terminate.h</a></td></tr>
+<tr class="ccode" id="inverseCompostionalLK_types_h.html"><td class="ccode"><a href="#">inverseCompostionalLK_types.h</a></td></tr>
+<tr class="ccode" id="norm_c.html"><td class="ccode"><a href="#">norm.c</a></td></tr>
+<tr class="ccode" id="norm_h.html"><td class="ccode"><a href="#">norm.h</a></td></tr>
+<tr class="ccode" id="rt_nonfinite_h.html"><td class="ccode"><a href="#">rt_nonfinite.h</a></td></tr>
+<tr class="ccode" id="rtwtypes_h.html"><td class="ccode"><a href="#">rtwtypes.h</a></td></tr>
+<tr class="ccode" id="sum_c.html"><td class="ccode"><a href="#">sum.c</a></td></tr>
+<tr class="ccode" id="sum_h.html"><td class="ccode"><a href="#">sum.h</a></td></tr>
+<tr class="ccode" id="warning_c.html"><td class="ccode"><a href="#">warning.c</a></td></tr>
+<tr class="ccode" id="warning_h.html"><td class="ccode"><a href="#">warning.h</a></td></tr>
+</tbody>
+</table>
+</div>
+<!-- End C Code List -->
+<div class="grayline methodset" onclick="ccodeClick(event,3);">
+<a class="collapsed">Interface Source Files</a>
+</div>
+<!-- Begin C Code List -->
+<div id="ccodelistbody3" class="hidden">
+<table class="myfunc-list" cellspacing="0" cellpadding="0" onclick="cFileClickWithMexWarning(event);">
+<tbody>
+<tr class="ccode" id="_coder_inverseCompostionalLK_api_c.html"><td class="ccode"><a href="#">_coder_inverseCompostionalLK_api.c</a></td></tr>
+<tr class="ccode" id="_coder_inverseCompostionalLK_api_h.html"><td class="ccode"><a href="#">_coder_inverseCompostionalLK_api.h</a></td></tr>
+<tr class="ccode" id="_coder_inverseCompostionalLK_info_c.html"><td class="ccode"><a href="#">_coder_inverseCompostionalLK_info.c</a></td></tr>
+<tr class="ccode" id="_coder_inverseCompostionalLK_info_h.html"><td class="ccode"><a href="#">_coder_inverseCompostionalLK_info.h</a></td></tr>
+<tr class="ccode" id="_coder_inverseCompostionalLK_mex_c.html"><td class="ccode"><a href="#">_coder_inverseCompostionalLK_mex.c</a></td></tr>
+<tr class="ccode" id="_coder_inverseCompostionalLK_mex_h.html"><td class="ccode"><a href="#">_coder_inverseCompostionalLK_mex.h</a></td></tr>
+</tbody>
+</table>
+</div>
+<!-- End C Code List -->
+</div>
+<!-- End C Code -->
+</div>
+<!-- Tooltips -->
+<div class="aux hidden">
+<div class="tooltips">
+<div class="tooltip" id="TT1"><table class="tooltip"><tr><th>Size</th><td><b>:</b>? x 2</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT2"><table class="tooltip"><tr><th>Size</th><td><b>:</b>? x <b>:</b>?</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT3"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT4"><table class="tooltip"><tr><th>Size</th><td>2 x 1</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT5"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT6"><table class="tooltip"><tr><th>Size</th><td>1 x <b>:</b>?</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT7"><table class="tooltip"><tr><th>Size</th><td>2 x 2</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT8"><table class="tooltip"><tr><th>Size</th><td>1 x 2</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT9"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>logical</td></tr></table></div>
+<div class="tooltip" id="TT10"><table class="tooltip"><tr><th>Size</th><td>2 x 1</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT11"><table class="tooltip"><tr><th>Size</th><td>1 x 5</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+<div class="tooltip" id="TT12"><table class="tooltip"><tr><th>Size</th><td>1 x 23</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+<div class="tooltip" id="TT13"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>function_handle</td></tr></table></div>
+<div class="tooltip" id="TT14"><table class="tooltip"><tr><th>Size</th><td>1 x 0</td></tr><tr><th>Class</th><td>cell</td></tr></table></div>
+<div class="tooltip" id="TT15"><table class="tooltip"><tr><th>Size</th><td>1 x 2</td></tr><tr><th>Class</th><td>cell</td></tr></table></div>
+<div class="tooltip" id="TT16"><table class="tooltip"><tr><th>Size</th><td>1 x 6</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+<div class="tooltip" id="TT17"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>cell</td></tr></table></div>
+<div class="tooltip" id="TT18"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>function_handle</td></tr></table></div>
+<div class="tooltip" id="TT19"><table class="tooltip"><tr><th>Size</th><td>1 x 3</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+<div class="tooltip" id="TT20"><table class="tooltip"><tr><th>Size</th><td>1 x 3</td></tr><tr><th>Class</th><td>cell</td></tr></table></div>
+<div class="tooltip" id="TT21"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>int32</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT22"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>function_handle</td></tr></table></div>
+<div class="tooltip" id="TT23"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>uint8</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT24"><table class="tooltip"><tr><th>Size</th><td>1 x 2</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+<div class="tooltip" id="TT25"><table class="tooltip"><tr><th>Size</th><td><b>:</b>? x <b>:</b>?</td></tr><tr><th>Class</th><td>logical</td></tr></table></div>
+<div class="tooltip" id="TT26"><table class="tooltip"><tr><th>Size</th><td><b>:</b>? x 1</td></tr><tr><th>Class</th><td>logical</td></tr></table></div>
+<div class="tooltip" id="TT27"><table class="tooltip"><tr><th>Size</th><td>1 x 2</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT28"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>mxArray</td></tr></table></div>
+<div class="tooltip" id="TT29"><table class="tooltip"><tr><th>Size</th><td>1 x 15</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+<div class="tooltip" id="TT30"><table class="tooltip"><tr><th>Size</th><td><b>:</b>? x 1</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT31"><table class="tooltip"><tr><th>Size</th><td>1 x <b>:</b>?</td></tr><tr><th>Class</th><td>logical</td></tr></table></div>
+<div class="tooltip" id="TT32"><table class="tooltip"><tr><th>Size</th><td>0 x 0</td></tr><tr><th>Class</th><td>double</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT33"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>int8</td></tr><tr><th>Complex</th><td>No</td></tr></table></div>
+<div class="tooltip" id="TT34"><table class="tooltip"><tr><th>Size</th><td>1 x 7</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+<div class="tooltip" id="TT35"><table class="tooltip"><tr><th>Size</th><td>1 x 1</td></tr><tr><th>Class</th><td>function_handle</td></tr></table></div>
+<div class="tooltip" id="TT36"><table class="tooltip"><tr><th>Size</th><td>1 x 27</td></tr><tr><th>Class</th><td>char</td></tr></table></div>
+</div>
+</div>
+<!-- End Tooltips -->
+
+<div class="south">
+<ul class="ui-tabs-nav">
+<li class="ui-tabs-nav-item ui-tabs-selected"><span class="tab-link" id="summary"><span>Summary</span></span></li>
+<li class="ui-tabs-nav-item"><span class="tab-link" id="messages"><span>All Messages (0)</span></span></li>
+<li class="ui-tabs-nav-item"><span class="tab-link" id="watchlist"><span>Variables</span></span></li>
+<li class="ui-tabs-nav-item hidden"><span class="tab-link" id="watchload"><span>Variables</span></span></li>
+<li class="ui-tabs-nav-item"><span class="tab-link" id="buildlog1"><span>Target Build Log</span></span></li>
+</ul>
+
+<!-- Compilation Summary -->
+<div id="summarybody" class="ui-tabs-panel">
+<table cellpadding="1" cellspacing="4">
+<tr><td>C source code generated on:</td><td>12-Sep-2016 03:24:15</td></tr>
+<tr><td>Coding target:</td><td>C MEX Function</td></tr>
+<tr><td>Number of errors:</td><td><a href="javascript:selectMessagesTab();">0</a></td></tr>
+<tr><td>Number of warnings:</td><td><a href="javascript:selectMessagesTab();">0</a></td></tr>
+<tr><td>Number of notices:</td><td><a href="javascript:selectMessagesTab();">0</a></td></tr>
+</table>
+<p/><p/><table>
+<tr><td><b>Tell Us What You Think</b></td></tr>
+<tr><td>We value your feedback. Please take a few minutes to answer this short questionnaire regarding the Code Generation Report.</td></tr>
+<tr><td><a href="matlab: web('http://www.customersat3.com/TakeSurvey.asp?si=ELu7GTnTYtk%3D','-browser');">&gt;&gt;Provide Feedback</a></td></tr>
+</table>
+</div>
+
+<!-- Message Table -->
+<div id="messagesbody" class="ui-tabs-panel hidden">
+<div>
+<div class="msgsuccess">Code generation successful. Click here to <a href="javaScript:selectSummaryTab();">view summary</a>.</div>
+</div>
+</div>
+<!-- Watchlist Table -->
+<div id="watchlistbody" class="ui-tabs-panel hidden">
+</div>
+<div id="watchloadbody" class="ui-tabs-panel hidden">
+Loading Variables table ...
+</div>
+
+<!-- Target Build Log -->
+<div id="buildlog1body" class="ui-tabs-panel hidden">
+<div class="grayline"></div>
+<table cellpadding="4" cellspacing="1"><tr>
+<td align="left" class="td-linebottomrt-gray" colspan="2">Build Parameters</td>
+</tr>
+<tr><td align="left" valign="top" class="td-linebottomrt">Build directory</td>
+<td align="left" valign="top" class="td-linebottomrt-link"><a href="matlab: cd('/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK')">/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK</a></td></tr>
+<tr><td align="left" valign="top" class="td-linebottomrt">Make wrapper</td>
+<td align="left" valign="top" class="td-linebottomrt-link">sh inverseCompostionalLK_mex.sh</td></tr>
+</table>
+<br/>
+<table border="1" cellpadding="4" cellspacing="1" width="100%">
+<tr><td align="left" class="td-linebottomrt-gray">Build Log</td></tr>
+<tr><td valign="top" class="td-script">
+<pre>
+<span class="td-line-number">    1   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_data.c"</span>
+<span class="td-line-number">    2   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_initialize.c"</span>
+<span class="td-line-number">    3   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_terminate.c"</span>
+<span class="td-line-number">    4   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK.c"</span>
+<span class="td-line-number">    5   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "gradient.c"</span>
+<span class="td-line-number">    6   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "eml_int_forloop_overflow_check.c"</span>
+<span class="td-line-number">    7   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "floor.c"</span>
+<span class="td-line-number">    8   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "assertValidSizeArg.c"</span>
+<span class="td-line-number">    9   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "bilinearInterpolate.c"</span>
+<span class="td-line-number">   10   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "sum.c"</span>
+<span class="td-line-number">   11   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "warning.c"</span>
+<span class="td-line-number">   12   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "norm.c"</span>
+<span class="td-line-number">   13   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "interface/_coder_inverseCompostionalLK_info.c"</span>
+<span class="td-line-number">   14   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "interface/_coder_inverseCompostionalLK_api.c"</span>
+<span class="td-line-number">   15   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "interface/_coder_inverseCompostionalLK_mex.c"</span>
+<span class="td-line-number">   16   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_emxutil.c"</span>
+<span class="td-line-number">   17   </span><span class="td-line-normal">/usr/bin/gcc -Wl,--version-script,inverseCompostionalLK_mex_mex.map inverseCompostionalLK_data.o inverseCompostionalLK_initialize.o inverseCompostionalLK_terminate.o inverseCompostionalLK.o gradient.o eml_int_forloop_overflow_check.o floor.o assertValidSizeArg.o bilinearInterpolate.o sum.o warning.o norm.o _coder_inverseCompostionalLK_info.o _coder_inverseCompostionalLK_api.o _coder_inverseCompostionalLK_mex.o inverseCompostionalLK_emxutil.o -pthread -Wl,--no-undefined -Wl,-rpath-link,/opt/MATLAB/R2016a/bin/glnxa64 -shared -L/opt/MATLAB/R2016a/bin/glnxa64 -lmx -lmex -lmat -lm -lstdc++    -o inverseCompostionalLK_mex.mexa64    -lemlrt -lcovrt -lut -lmwmathutil </span>
+</pre>
+</td></tr></table>
+
+</div>
+</div>
+<!-- Begin MATLAB Code Panel -->
+<div class="center">
+<div class="center-title">
+<div class="ui-tabs-nav-item ui-tabs-selected">
+<span class="functiontitle">
+</span>
+<!-- Begin Call Sites -->
+<span id="callsiteselecttable" class="call-sites-tbl">
+<span id="callsiteselectlabel" class="filtered">Calls:</span>
+<select id="callsiteselect" onchange="callSiteChange(event)">
+<option value="callsiteprompt">Select a function call:</option>
+</select>
+</span>
+<!-- End Call Sites -->
+</div>
+</div>
+<div class="ui-tabs-panel">
+<div class="code" onmouseover="mcodeMouseOver(event);" onmouseout="mcodeMouseOut(event);"onclick="mcodeClick(event);">
+</div>
+</div>
+</div>
+<!-- End MATLAB Code Panel -->
+</body>
+</html>

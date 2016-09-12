@@ -1,0 +1,64 @@
+<html>
+<head>
+<div class="baselog">
+<link rel="stylesheet" href="resources/matlab-report-styles.css" type="text/css" />
+<style type="text/css" media="screen">
+div.treeview { white-space: nowrap; }
+.treeview img { border: 0px; vertical-align: middle; }
+.trigger { cursor: pointer; }
+.branch { display: none; margin-left: 22px; }
+span.lnnolink { cursor: pointer; color: blue; text-decoration: underline; padding: 1 }
+span.lnnonorm { color: grey; padding: 1 }
+span.textnorm { color: black; padding: 1 }
+span.textcmnt { color: green; padding: 1 }
+span.msglink { cursor: pointer; color: blue; text-decoration: underline }
+span.treelink { cursor: pointer; color: blue; text-decoration: underline }
+.error { color: red; }
+.fcflink { cursor: pointer; color: blue; text-decoration: underline }
+div.tooltip { visibility: hidden; position: fixed;
+  background-color: lightyellow; border: 1px solid black; }
+.td-linebottomrt-gray {border-bottom:1px solid #BBB; border-right:1px solid #BBB;background-color:#F0F0F0;}
+.td-linebottomrt-link {border-bottom:1px solid #BBB; border-right:1px solid #BBB;color:Blue;}
+</style>
+</div>
+<title>Code Generation Report For 'inverseCompostionalLK'</title>
+</head>
+<body>
+<div class="report-head">MATLAB Coder Build Log</div><p/>
+<div class="baselog">
+<div class="grayline"></div>
+<table cellpadding="4" cellspacing="1"><tr>
+<td align="left" class="td-linebottomrt-gray" colspan="2">Build Parameters</td>
+</tr>
+<tr><td align="left" valign="top" class="td-linebottomrt">Build directory</td>
+<td align="left" valign="top" class="td-linebottomrt-link"><a href="matlab: cd('/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK')">/home/maciag/Dropbox/Praca magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK</a></td></tr>
+<tr><td align="left" valign="top" class="td-linebottomrt">Make wrapper</td>
+<td align="left" valign="top" class="td-linebottomrt-link">sh inverseCompostionalLK_mex.sh</td></tr>
+</table>
+<br/>
+<table border="1" cellpadding="4" cellspacing="1" width="100%">
+<tr><td align="left" class="td-linebottomrt-gray">Build Log</td></tr>
+<tr><td valign="top" class="td-script">
+<pre>
+<span class="td-line-number">    1   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_data.c"</span>
+<span class="td-line-number">    2   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_initialize.c"</span>
+<span class="td-line-number">    3   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_terminate.c"</span>
+<span class="td-line-number">    4   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK.c"</span>
+<span class="td-line-number">    5   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "gradient.c"</span>
+<span class="td-line-number">    6   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "eml_int_forloop_overflow_check.c"</span>
+<span class="td-line-number">    7   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "floor.c"</span>
+<span class="td-line-number">    8   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "assertValidSizeArg.c"</span>
+<span class="td-line-number">    9   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "bilinearInterpolate.c"</span>
+<span class="td-line-number">   10   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "sum.c"</span>
+<span class="td-line-number">   11   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "warning.c"</span>
+<span class="td-line-number">   12   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "norm.c"</span>
+<span class="td-line-number">   13   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "interface/_coder_inverseCompostionalLK_info.c"</span>
+<span class="td-line-number">   14   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "interface/_coder_inverseCompostionalLK_api.c"</span>
+<span class="td-line-number">   15   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "interface/_coder_inverseCompostionalLK_mex.c"</span>
+<span class="td-line-number">   16   </span><span class="td-line-normal">/usr/bin/gcc -c -ansi -fexceptions -fPIC -fno-omit-frame-pointer -pthread -D_GNU_SOURCE -DMATLAB_MEX_FILE   -O -DNDEBUG  -I "/opt/MATLAB/R2016a/simulink/include" -I "/opt/MATLAB/R2016a/toolbox/shared/simtargets" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker" -I "/home/maciag/Dropbox/Praca\ magisterska/git/matlab/LucasKanadeTracker/codegen/mex/inverseCompostionalLK" -I "./interface" -I "/opt/MATLAB/R2016a/extern/include" -I "." "inverseCompostionalLK_emxutil.c"</span>
+<span class="td-line-number">   17   </span><span class="td-line-normal">/usr/bin/gcc -Wl,--version-script,inverseCompostionalLK_mex_mex.map inverseCompostionalLK_data.o inverseCompostionalLK_initialize.o inverseCompostionalLK_terminate.o inverseCompostionalLK.o gradient.o eml_int_forloop_overflow_check.o floor.o assertValidSizeArg.o bilinearInterpolate.o sum.o warning.o norm.o _coder_inverseCompostionalLK_info.o _coder_inverseCompostionalLK_api.o _coder_inverseCompostionalLK_mex.o inverseCompostionalLK_emxutil.o -pthread -Wl,--no-undefined -Wl,-rpath-link,/opt/MATLAB/R2016a/bin/glnxa64 -shared -L/opt/MATLAB/R2016a/bin/glnxa64 -lmx -lmex -lmat -lm -lstdc++    -o inverseCompostionalLK_mex.mexa64    -lemlrt -lcovrt -lut -lmwmathutil </span>
+</pre>
+</td></tr></table>
+</div>
+</body>
+</html>
