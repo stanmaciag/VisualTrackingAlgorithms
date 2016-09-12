@@ -15,8 +15,8 @@ gamma = 0.2;
 windowDeltaSize = 0.1;
 
 idxMapFcnHandle = @binIdxMap;
-histogramFcnHandle = @mexNormalizedWeightedHistogram;
-pixelWeightsFcnHandle = @mexPixelWeights;
+histogramFcnHandle = @normalizedWeightedHistogram_mex;
+pixelWeightsFcnHandle = @pixelWeights_mex;
 
 %%
 

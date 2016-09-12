@@ -1,19 +1,15 @@
-%clear all;
+clear all;
 close all;
-%clc;
+clc;
 
 %%
-
-%video = VideoReader('tilted_face.avi');
-%currentFrame = rgb2gray(readFrame(video));
-%imresize(currentFrame, [320 480]);
 
 videoFileReader = vision.VideoFileReader('tilted_face.avi');
 currentFrame = step(videoFileReader);
 currentFrameHSV = rgb2hsv(currentFrame);
 
-bins = [32; 32; 16];
-computationRegionBandwidth = 2;
+bins = [16; 16; 16];
+computationRegionBandwidth = 3;
 maxIterations = 10;
 threshold = 1;
 minRadious = 20;
@@ -21,7 +17,7 @@ scalingFactor = 4;
 modelBandwidth = 4;
 
 idxMapFcnHandle = @binIdxMap;
-histogramFcnHandle = @mexWeightedHistogram;
+histogramFcnHandle = @weightedHistogram_mex;
 
 %%
 
@@ -33,17 +29,13 @@ hold on;
 rectangle('Position', roiRect, 'EdgeColor', 'red');
 hold off;
 
-%currentFrame = im2uint8(currentFrame);
-%roi = currentFrame(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) + roiRect(3), :);
+
 roi = currentFrameHSV(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) + roiRect(3), :);
-%roi = currentFrameHSV(roiRect(1):roiRect(1) + roiRect(3), roiRect(2):roiRect(2) + roiRect(4), :);
-%roiRect = [roiRect(2), roiRect(1), roiRect(4), roiRect(3)];
 
 %%
 
-%clear targetModel;
-%targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins, idxMapFcnHandle, histogramFcnHandle);
-targetModel = ratioHistogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, @backgorundScalingProfile, bins, modelBandwidth, scalingFactor, idxMapFcnHandle, histogramFcnHandle);
+targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins, idxMapFcnHandle, histogramFcnHandle);
+%targetModel = ratioHistogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, @backgorundScalingProfile, bins, modelBandwidth, scalingFactor, idxMapFcnHandle, histogramFcnHandle);
 targetPosition = [round(roiRect(2) + roiRect(4)/2), round(roiRect(1) + roiRect(3)/2)];
 
 %%
@@ -71,20 +63,7 @@ while ~isDone(videoFileReader)
     
     currentTime = toc;
     
-   
-    %x1 = round(currentPosition(2) - targetModel.horizontalRadious);
-    %y1 = round(currentPosition(1) - targetModel.verticalRadious);
-    %x2 = round(currentPosition(2) + targetModel.horizontalRadious);
-    %y2 = round(currentPosition(1) - targetModel.verticalRadious);
-    %x3 = round(currentPosition(2) + targetModel.horizontalRadious);
-    %y3 = round(currentPosition(1) + targetModel.verticalRadious);
-    %x4 = round(currentPosition(2) - targetModel.horizontalRadious);
-    %y4 = round(currentPosition(1) + targetModel.verticalRadious);
     rotMatrix = [cos(theta) -sin(theta); sin(theta) cos(theta)];
-    %p1 = [targetModel.horizontalRadious; targetModel.verticalRadious];
-    %p2 = [targetModel.horizontalRadious; -targetModel.verticalRadious];
-    %p3 = [-targetModel.horizontalRadious; -targetModel.verticalRadious];
-    %p4 = [-targetModel.horizontalRadious; targetModel.verticalRadious];
     
     p1 = [dimensions(2); dimensions(1)];
     p2 = [dimensions(2); -dimensions(1)];
@@ -103,9 +82,7 @@ while ~isDone(videoFileReader)
     
     boundingRect = [currentPosition(2) - targetModel.horizontalRadious , currentPosition(1) - targetModel.verticalRadious, ...
         2 * targetModel.horizontalRadious + 1, 2 * targetModel.verticalRadious + 1];
-    %boundingRect = [targetPosition(2) - roiRect(3)/2  * windowBandwidth , targetPosition(1) - roiRect(4)/2  * windowBandwidth, ...
-    %    roiRect(3) * windowBandwidth, roiRect(4) * windowBandwidth]; 
-    
+  
     currentFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');
     currentFrame = insertShape(currentFrame, 'Rectangle', boundingRect, 'Color', 'blue');
     step(videoPlayer, currentFrame);

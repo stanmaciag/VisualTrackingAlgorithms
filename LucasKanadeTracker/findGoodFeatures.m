@@ -47,10 +47,14 @@ function goodFeatures = findGoodFeatures(image, windowRadiousY, windowRadiousX, 
             gradientMomentXX = sum(gradientXWindow.^2);
             gradientMomentXY = sum(gradientXWindow .* gradientYWindow);
             gradientMomentYY = sum(gradientYWindow.^2);
+            
+            %gradientMomentXX = sum(gradientXWindow' * gradientXWindow);
+            %gradientMomentXY = sum(gradientXWindow' * gradientYWindow);
+            %gradientMomentYY = sum(gradientYWindow' * gradientYWindow);
             hessian = [gradientMomentXX gradientMomentXY; gradientMomentXY gradientMomentYY];
             currentEigenvals = eig(hessian);
             
-            minEigenval(j,i) = real(min(currentEigenvals));
+            minEigenval(j,i) = min(currentEigenvals);
             
             
         end
@@ -66,7 +70,7 @@ function goodFeatures = findGoodFeatures(image, windowRadiousY, windowRadiousX, 
         
         for i = 1 + windowRadiousX : size(image, 2) - windowRadiousX
             
-            if minEigenval(j,i) > maxEigRetainThreshold * maxMinEigenval
+            if isreal(minEigenval(j,i)) && minEigenval(j,i) > maxEigRetainThreshold * maxMinEigenval
                
                 isGoodFeature(j,i) = true;
                 

@@ -1,4 +1,7 @@
-#include "histogramEngine.h"
+#include <math.h>
+#include "mex.h"
+
+void computeBinArray(const double *image, const double *bins, const mwSize *imageDim, const double minRange, const double maxRange, double *binIdxArray);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -77,5 +80,45 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     return;
     
+    
+}
+
+void computeBinArray(const double *image, const double *bins, const mwSize *imageDim, const double minRange, const double maxRange, double *binIdxArray)
+{
+    
+    unsigned i, j, k;
+  
+    double *binRange, multiplier;
+    binRange = (double*)mxCalloc(imageDim[2],sizeof(double));
+    
+    for (i = 0; i < imageDim[2]; ++i)
+    {
+        binRange[i] = ((double)maxRange - (double)minRange) / ((double)bins[i] - 1.0);
+    }
+    
+    for (i = 0; i < imageDim[0]; ++i)
+    {
+        
+        for (j = 0; j < imageDim[1]; ++j)
+        {
+            
+            multiplier = 1.0;
+            
+            for (k = 0; k < imageDim[2]; ++k)
+            {
+                
+                binIdxArray[i + j * imageDim[0]] += floor(image[i + imageDim[0] * (j + imageDim[1] * k)] / binRange[k]) * multiplier;
+                multiplier *= bins[k];
+                
+            }
+            
+            // Increment index to achive consistency with Matlab indexing convention
+            binIdxArray[i + j * imageDim[0]] += 1.0;
+            
+        }
+        
+    }
+
+    mxFree(binRange);
     
 }

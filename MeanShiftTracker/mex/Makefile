@@ -10,22 +10,22 @@ all: binIdxMap normalizedWeightedHistogram weightedHistogram pixelWeights
 
 binIdxMap:
 	@echo Compiling binIdxMap MEX...
-	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" mexBinIdxMap.c histogramEngine.c 
+	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" binIdxMap_mex.c
 	@echo Done.
 
 normalizedWeightedHistogram:
 	@echo Compiling normalizedWeightedHistogram MEX...
-	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" ./mexNormalizedWeightedHistogram.c histogramEngine.c 
+	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" normalizedWeightedHistogram_mex.c histogramEngine.c 
 	@echo Done.
 
 weightedHistogram:
 	@echo Compiling weightedHistogram MEX...
-	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" ./mexWeightedHistogram.c histogramEngine.c
+	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" weightedHistogram_mex.c histogramEngine.c
 	@echo Done.
 
 pixelWeights:
 	@echo Compiling pixelWeights MEX...
-	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" ./mexPixelWeights.c
+	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" pixelWeights_mex.c
 	@echo Done.
 
 clean:

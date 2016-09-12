@@ -110,7 +110,34 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     plhs[0] = mxCreateDoubleMatrix(outputSize, 1, mxREAL);
     normalizedWeightedHistogram = (double*)mxGetPr(plhs[0]);
     
-    computeNormalizedWeightedHistogram(binIdxArray, kernel, imageDim, normalizedWeightedHistogram);
+    // Compute weighted histogram
+    computeWeightedHistogram(binIdxArray, kernel, imageDim, normalizedWeightedHistogram);
+    
+    double normalizationConstant = 0.0, normalizationConstantAcc = 0.0;
+    
+    // Accumulate normalization constant
+    for (i = 0; i < imageDim[0]; ++i)         
+    {
+        
+        for (j = 0; j < imageDim[1]; ++j)
+        {
+                
+            normalizationConstantAcc += kernel[i + j * kernelDim[0]];
+            
+        }
+        
+    }
+    
+    // Calculate normalization constant
+    normalizationConstant = 1.0 / normalizationConstantAcc;
+    
+    // Normalize histogram
+    for (i = 0; i < outputSize; ++i)            
+    {
+         
+        normalizedWeightedHistogram[i] *= normalizationConstant;
+        
+    }
     
     mxFree(bins);
     

@@ -110,6 +110,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     plhs[0] = mxCreateDoubleMatrix(outputSize, 1, mxREAL);
     weightedHistogram = (double*)mxGetPr(plhs[0]);
     
+    // Compute weighted histogram
     computeWeightedHistogram(binIdxArray, kernel, imageDim, weightedHistogram);
     
     mxFree(bins);
