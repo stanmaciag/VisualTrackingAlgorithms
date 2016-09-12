@@ -10,3 +10,6 @@ resources
 
 # Temporary files
 *~
+
+# Generated code
+codegen
