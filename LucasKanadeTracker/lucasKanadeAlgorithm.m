@@ -1,13 +1,16 @@
-function opticalFlow = lucasKandeAlgorithm(previousFrame, currentFrame, ...
+function opticalFlow = lucasKanadeAlgorithm(previousFrame, currentFrame, ...
     pointsToTrack, windowRadiousY, windowRadiousX, maxIterations, ...
     stopThreshold, weightingKernelFcnHandle, engineFcnHandle, initialOpticalFlow)
     
     % Zero initial flow if another not given
-    if nargin < 9
+    if nargin < 10
        
         initialOpticalFlow = zeros(size(pointsToTrack));
         
     end
+    
+    previousFrame = double(previousFrame);
+    currentFrame = double(currentFrame);
     
     % Compute kernel for current window
     [kernelX, kernelY] = meshgrid(1 : 2 * windowRadiousX + 1, 1 : 2 * windowRadiousY + 1);

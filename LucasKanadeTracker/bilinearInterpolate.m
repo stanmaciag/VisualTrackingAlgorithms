@@ -1,15 +1,19 @@
-function imageInterpolation = bilinearInterpolate(image, subpixelsY, subpixelsX)
+function imageInterpolation = bilinearInterpolate(image, subpixelY, subpixelX)
 
-    pixelsY = floor(subpixelsY);
-    pixelsX = floor(subpixelsX);
+    pixelY = floor(subpixelY);
+    pixelX = floor(subpixelX);
 
-    remainderY = subpixelsY - pixelsY;
-    remainderX = subpixelsX - pixelsX;
+    remainderY = subpixelY - pixelY;
+    remainderX = subpixelX - pixelX;
     
-    imageInterpolation = (1 - remainderY) .* (1 - remainderX) .* image(pixelsY(1):pixelsY(end), pixelsX(1):pixelsX(end)) ...
-        + remainderY .* (1 - remainderX) .* image(pixelsY(1) + 1:pixelsY(end) + 1, pixelsX(1):pixelsX(end)) ...
-        + (1 - remainderY) .* remainderX .* image(pixelsY(1):pixelsY(end), pixelsX(1) + 1:pixelsX(end) + 1) ...
-        + remainderY .* remainderX .* image(pixelsY(1) + 1:pixelsY(end) + 1, pixelsX(1) + 1:pixelsX(end) + 1);
+    pixelIdxY0X0 = sub2ind(size(image),pixelY,pixelX);
+    pixelIdxY1X0 = sub2ind(size(image),pixelY + 1,pixelX);
+    pixelIdxY0X1 = sub2ind(size(image),pixelY,pixelX + 1);
+    pixelIdxY1X1 = sub2ind(size(image),pixelY + 1,pixelX + 1);
+    
+    imageInterpolation = (1 - remainderY) .* (1 - remainderX) .* image(pixelIdxY0X0) ...
+        + remainderY .* (1 - remainderX) .* image(pixelIdxY1X0) ...
+        + (1 - remainderY) .* remainderX .* image(pixelIdxY0X1) ...
+        + remainderY .* remainderX .* image(pixelIdxY1X1);
             
 end
-

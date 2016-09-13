@@ -19,7 +19,7 @@ roi = currentFrame(roiRect(1):roiRect(1) + roiRect(3), roiRect(2):roiRect(2) + r
 
 windowRadiousY = 5;
 windowRadiousX = 5;
-maxIterations = 5;
+maxIterations = 3;
 stopThreshold = 0.5;
 pyramidDepth = 3;
 %engineFcnHandle = @forwardAdditiveLK;
@@ -28,7 +28,7 @@ weightingKernelFcnHandle = @gaussianKernel;
 
 %%
 
-features = findGoodFeatures(roi, 2, 2, 0.2, 5);
+features = findGoodFeatures(roi, 2, 2, 0.3, 15);
 features(:,1) = features(:,1) + roiRect(1);
 features(:,2) = features(:,2) + roiRect(2);
 
@@ -54,11 +54,14 @@ while ~isDone(videoFileReader)
     tic;
     
     flow = pyramidalLucasKanade(previousFrame, currentFrame, features, windowRadiousY, ...
-        windowRadiousX, maxIterations, stopThreshold, pyramidDepth, engineFcnHandle, weightingKernelFcnHandle);
+         windowRadiousX, maxIterations, stopThreshold, pyramidDepth, engineFcnHandle, weightingKernelFcnHandle);
     
-    features = features + flow;
+    %flow = lucasKanadeAlgorithm(previousFrame, currentFrame, features, windowRadiousY, ...
+    %    windowRadiousX, maxIterations, stopThreshold, weightingKernelFcnHandle, engineFcnHandle);
     
     currentTime = toc;
+    
+    features = features + flow;
     
     minTime = min(currentTime, minTime);
     maxTime = max(currentTime, maxTime);
