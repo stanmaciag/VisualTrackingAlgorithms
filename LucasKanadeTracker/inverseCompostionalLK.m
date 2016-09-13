@@ -7,7 +7,7 @@ function opticalFlow = inverseCompostionalLK(previousFrame, currentFrame, ...
     % Framework International Journal of Computer Vision, 2004, 56, 221-255
 
     % Compute spatial gradients of previous frame
-    [gradientX, gradientY] = gradient(previousFrame);
+    %[gradientX, gradientY] = gradient(previousFrame);
     
     % Initialize optical flow vectors
     opticalFlow = zeros(size(pointsToTrack));
@@ -35,8 +35,10 @@ function opticalFlow = inverseCompostionalLK(previousFrame, currentFrame, ...
     % Compute template's spatial gradients in every search window (has to
     % be interpolated, because function accetps non-integer coordinates of
     % tracked points)
-    gradientYWindow = bilinearInterpolate_mex(gradientY, windowPixelsY, windowPixelsX);
-    gradientXWindow = bilinearInterpolate_mex(gradientX, windowPixelsY, windowPixelsX);
+    %gradientYWindow = bilinearInterpolate_mex(gradientY, windowPixelsY, windowPixelsX);
+    %gradientXWindow = bilinearInterpolate_mex(gradientX, windowPixelsY, windowPixelsX);
+    %[gradientXWindow, gradientYWindow] = interpolatedGradient(previousFrame, windowPixelsY, windowPixelsX);
+    [gradientXWindow, gradientYWindow] = interpolatedGradient_mex(previousFrame, windowPixelsY, windowPixelsX);
     
     % Get template image in every search window
     templateWindow = bilinearInterpolate_mex(previousFrame, windowPixelsY, windowPixelsX);
@@ -86,12 +88,12 @@ function opticalFlow = inverseCompostionalLK(previousFrame, currentFrame, ...
         errorImage = windowWarped - templateWindow(:,:,toProcessIdx);
         
         % Update steppest descent parameters
-        steppestDescentUpdate = [sum(sum(gradientXWindow(:,:,toProcessIdx) .* errorImage .* weightingKernel(:,:,toProcessIdx))); ... 
-                sum(sum(gradientYWindow(:,:,toProcessIdx) .* errorImage .* weightingKernel(:,:,toProcessIdx)))];
+        steppestDescentUpdate = [sum(sum(gradientXWindow(:,:,toProcessIdx) .* errorImage .* weightingKernel(:, :, toProcessIdx))); ... 
+                sum(sum(gradientYWindow(:, :, toProcessIdx) .* errorImage .* weightingKernel(:, :, toProcessIdx)))];
         
         % Compute optical flow change
-        flowChange = [invHessian(1,1,toProcessIdx) .* steppestDescentUpdate(1,1,:) + invHessian(1,2,toProcessIdx) .* steppestDescentUpdate(2,1,:), ...
-            invHessian(2,1,toProcessIdx) .* steppestDescentUpdate(1,1,:) + invHessian(2,2,toProcessIdx) .* steppestDescentUpdate(2,1,:)];
+        flowChange = [invHessian(1, 1, toProcessIdx) .* steppestDescentUpdate(1, 1, :) + invHessian(1, 2, toProcessIdx) .* steppestDescentUpdate(2, 1, :), ...
+            invHessian(2, 1, toProcessIdx) .* steppestDescentUpdate(1, 1, :) + invHessian(2, 2, toProcessIdx) .* steppestDescentUpdate(2, 1, :)];
         
         % Rearrange result dimensions to fit convention
         flowChange = permute(flowChange,[3,2,1]);

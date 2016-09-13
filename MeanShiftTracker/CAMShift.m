@@ -6,22 +6,31 @@ function [currentPosition, candidateModel, orientation, dimensions] = CAMShift(c
 % Real time face and object tracking as a component of a perceptual user
 % interface - Gary R. Bradski
 
+    %currentFrame = double(currentFrame);
+
     % Get pixel value range from current frame class
     range = getrangefromclass(currentFrame);
     
     % Initialize candidate model with target model
     candidateModel = targetModel;
     
+    %calculationRegionMinY = max(1, previousPosition(1) - round(candidateModel.verticalRadious * calculationBandwidth));
+    %calculationRegionMaxY = min(size(currentFrame,1), previousPosition(1) + round(candidateModel.verticalRadious * calculationBandwidth));
+    %calculationRegionMinX = max(1, previousPosition(2) - round(candidateModel.horizontalRadious * calculationBandwidth));
+    %calculationRegionMaxX = min(size(currentFrame,2), previousPosition(2) + round(candidateModel.horizontalRadious * calculationBandwidth));
+    
     % Get extremal coordinates of calculation region (limited by image
-    % boundaries)
-    calculationRegionMinY = max(1, previousPosition(1) - round(candidateModel.verticalRadious * calculationBandwidth));
-    calculationRegionMaxY = min(size(currentFrame,1), previousPosition(1) + round(candidateModel.verticalRadious * calculationBandwidth));
-    calculationRegionMinX = max(1, previousPosition(2) - round(candidateModel.horizontalRadious * calculationBandwidth));
-    calculationRegionMaxX = min(size(currentFrame,2), previousPosition(2) + round(candidateModel.horizontalRadious * calculationBandwidth));
+    % boundaries) - calculation region is square, which size is based on
+    % larger candidate's model radious and bandwidth
+    maxRadious = max(candidateModel.verticalRadious, candidateModel.horizontalRadious);
+    calculationRegionMinY = max(1, previousPosition(1) - round(maxRadious * calculationBandwidth));
+    calculationRegionMaxY = min(size(currentFrame,1), previousPosition(1) + round(maxRadious * calculationBandwidth));
+    calculationRegionMinX = max(1, previousPosition(2) - round(maxRadious * calculationBandwidth));
+    calculationRegionMaxX = min(size(currentFrame,2), previousPosition(2) + round(maxRadious * calculationBandwidth));
     
     % Compute bin index map for calculation region
-    currentFrameBinIdxMap = idxMapFcnHandle(currentFrame(calculationRegionMinY:calculationRegionMaxY, ...
-        calculationRegionMinX: calculationRegionMaxX, :), targetModel.histogramBins, range(1), range(2));
+    currentFrameBinIdxMap = idxMapFcnHandle(double(currentFrame(calculationRegionMinY:calculationRegionMaxY, ...
+        calculationRegionMinX: calculationRegionMaxX, :)), targetModel.histogramBins, range(1), range(2));
     
     % Back-project target histogram using current bin index map (compute
     % pixels probabilities of membership to target model)
@@ -32,17 +41,23 @@ function [currentPosition, candidateModel, orientation, dimensions] = CAMShift(c
     currentPosition = previousPosition - [calculationRegionMinY, calculationRegionMinX];
     
     % Get grid of local calculation region coordinates
-    [coordsHorizontal, coordsVertical] = meshgrid(1 : 2 * candidateModel.horizontalRadious + 1, ... 
-        1 : 2 * candidateModel.verticalRadious + 1);
+    %[coordsHorizontal, coordsVertical] = meshgrid(1 : 2 * candidateModel.horizontalRadious + 1, ... 
+    %   1 : 2 * candidateModel.verticalRadious + 1);
+    [coordsHorizontal, coordsVertical] = meshgrid(1 : 2 * maxRadious + 1, ... 
+       1 : 2 * maxRadious + 1);
     
     % Iterate while not converged or until iterations limit is reached
     for i = 1:maxIterations
         
         % Get extremal coordinates of search window
-        searchWindowMinY = currentPosition(1) - candidateModel.verticalRadious;
-        searchWindowMaxY = currentPosition(1) + candidateModel.verticalRadious;
-        searchWindowMinX = currentPosition(2) - candidateModel.horizontalRadious;
-        searchWindowMaxX = currentPosition(2) + candidateModel.horizontalRadious;
+        %searchWindowMinY = currentPosition(1) - candidateModel.verticalRadious;
+        %searchWindowMaxY = currentPosition(1) + candidateModel.verticalRadious;
+        %searchWindowMinX = currentPosition(2) - candidateModel.horizontalRadious;
+        %searchWindowMaxX = currentPosition(2) + candidateModel.horizontalRadious;
+        searchWindowMinY = currentPosition(1) - maxRadious;
+        searchWindowMaxY = currentPosition(1) + maxRadious;
+        searchWindowMinX = currentPosition(2) - maxRadious;
+        searchWindowMaxX = currentPosition(2) + maxRadious;
 
         % Compute sizes of necessary zeros-padding areas - asserts proper
         % operation when selected search window outreaches calculation
@@ -102,15 +117,18 @@ function [currentPosition, candidateModel, orientation, dimensions] = CAMShift(c
         % Calculate window size change coefficient 
         sizeCoeff = newWindowSize / (searchWindowMaxX - searchWindowMinX);
         
+        candidateModel.verticalRadious = round(candidateModel.verticalRadious * sizeCoeff);
+        candidateModel.horizontalRadious = round(candidateModel.horizontalRadious * sizeCoeff);
+        
         % Set new search window size if bigger than given minimal value -
         % prevents from window disappearing
-        newHorizontalRadious = round(candidateModel.horizontalRadious * sizeCoeff);     
-        if (newHorizontalRadious > minHorizontalRadious)
+        %newHorizontalRadious = round(candidateModel.horizontalRadious * sizeCoeff);     
+        %if (newHorizontalRadious > minHorizontalRadious)
         
-            candidateModel.verticalRadious = round(candidateModel.verticalRadious * sizeCoeff);
-            candidateModel.horizontalRadious = newHorizontalRadious;
-            
-        end
+        %    candidateModel.verticalRadious = round(candidateModel.verticalRadious * sizeCoeff);
+        %    candidateModel.horizontalRadious = newHorizontalRadious;
+        
+        %end
         
         % Calculate second order statistical moments of target ROI
         M20 = sum(sum(roi.*coordsHorizontal.^2));

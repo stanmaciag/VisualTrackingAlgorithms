@@ -8,13 +8,13 @@ videoFileReader = vision.VideoFileReader('tilted_face.avi');
 currentFrame = step(videoFileReader);
 currentFrameHSV = rgb2hsv(currentFrame);
 
-bins = [16; 16; 16];
+bins = [32; 16; 16];
 computationRegionBandwidth = 3;
 maxIterations = 10;
 threshold = 1;
 minRadious = 20;
-scalingFactor = 4;
-modelBandwidth = 4;
+scalingFactor = 0.1;
+modelBandwidth = 2;
 
 idxMapFcnHandle = @binIdxMap;
 histogramFcnHandle = @weightedHistogram_mex;
@@ -29,13 +29,14 @@ hold on;
 rectangle('Position', roiRect, 'EdgeColor', 'red');
 hold off;
 
-
 roi = currentFrameHSV(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) + roiRect(3), :);
 
 %%
-
+tic
 targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins, idxMapFcnHandle, histogramFcnHandle);
-%targetModel = ratioHistogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, @backgorundScalingProfile, bins, modelBandwidth, scalingFactor, idxMapFcnHandle, histogramFcnHandle);
+%targetModel = ratioHistogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, @backgorundScalingProfile, bins, ...
+%    modelBandwidth, scalingFactor, idxMapFcnHandle, histogramFcnHandle);
+toc
 targetPosition = [round(roiRect(2) + roiRect(4)/2), round(roiRect(1) + roiRect(3)/2)];
 
 %%
@@ -59,16 +60,22 @@ while ~isDone(videoFileReader)
     currentFrameHSV = rgb2hsv(currentFrame);
     
     tic;
-    [currentPosition, targetModel, theta, dimensions] = CAMShift(currentFrameHSV, targetModel, currentPosition, computationRegionBandwidth, maxIterations, threshold, minRadious, idxMapFcnHandle);
+    [currentPosition, targetModel, theta, dimensions] = ...
+        CAMShift(currentFrameHSV, targetModel, currentPosition, computationRegionBandwidth, ...
+        maxIterations, threshold, minRadious, idxMapFcnHandle);
     
     currentTime = toc;
     
     rotMatrix = [cos(theta) -sin(theta); sin(theta) cos(theta)];
     
-    p1 = [dimensions(2); dimensions(1)];
-    p2 = [dimensions(2); -dimensions(1)];
-    p3 = [-dimensions(2); -dimensions(1)];
-    p4 = [-dimensions(2); dimensions(1)];
+    %p1 = [dimensions(2); dimensions(1)];
+    %p2 = [dimensions(2); -dimensions(1)];
+    %p3 = [-dimensions(2); -dimensions(1)];
+    %p4 = [-dimensions(2); dimensions(1)];
+    p1 = [dimensions(1); dimensions(2)];
+    p2 = [dimensions(1); -dimensions(2)];
+    p3 = [-dimensions(1); -dimensions(2)];
+    p4 = [-dimensions(1); dimensions(2)];
     
     p1 = rotMatrix*p1;
     p2 = rotMatrix*p2;

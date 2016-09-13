@@ -1,6 +1,8 @@
 function [targetModel, backgroundModel] = ratioHistogramModel(image, targetRoi, windowProfileFcnHandle, backgroundProfileFcnHandle, ...
     histogramBins, bandwidth, scalingFactor, idxMapFcnHandle, histogramFcnHandle)
 
+    image = double(image);
+
     % Get target ROI part from the whole image
     targetImage = image(targetRoi(2) : targetRoi(2) + targetRoi(4), targetRoi(1) : targetRoi(1) + targetRoi(3), :);
 
@@ -93,8 +95,8 @@ function [targetModel, backgroundModel] = ratioHistogramModel(image, targetRoi, 
     % Compute bin weights - weight of the bin is inversely proportional to
     % its significance in the whole histogram
     binWeights = ones(size(backgroundModel.histogram));
-    nonZeroInds = backgroundModel.histogram > 0;
-    binWeights(nonZeroInds) = minimalNonZeroBin./backgroundModel.histogram(nonZeroInds);
+    nonZeroIdcs = backgroundModel.histogram > 0;
+    binWeights(nonZeroIdcs) = minimalNonZeroBin./backgroundModel.histogram(nonZeroIdcs);
     
     % Adjust bins values of the target histogram by weights - bins, that
     % are more significant in the background histogram are less significant

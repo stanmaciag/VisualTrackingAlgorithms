@@ -1,6 +1,8 @@
 function model = histogramModel(image, targetRoi, windowProfileFcnHandle, histogramBins, ...
 idxMapFcnHandle, histogramFcnHandle)
 
+    image = double(image);
+
     % Get target ROI part from the whole image
     targetImage = image(targetRoi(2) : targetRoi(2) + targetRoi(4), targetRoi(1) : targetRoi(1) + targetRoi(3), :);
 

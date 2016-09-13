@@ -3,7 +3,9 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
     histogramFcnHandle, pixelWeightsFcnHandle)
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Kernel-based object tracking
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Real-time tracking of non-rigid objects using mean shift
-    
+% TODO Sprawdzić izotropowość
+    %currentFrame = double(currentFrame);
+
     % Get pixel value range from current frame class
     range = getrangefromclass(currentFrame);
     
@@ -40,7 +42,8 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
          % Get target ROI from current frame (resistant to
         % outreaching image boundaries)
         roi = zeros(roiMaxY - roiMinY + 1, roiMaxX - roiMinX + 1, size(currentFrame,3));    
-        roi(roiMinYPad + 1 : size(roi,1) - roiMaxYPad, roiMinXPad + 1 : size(roi,2) - roiMaxXPad, :) = double(currentFrame(roiMinY + roiMinYPad : roiMaxY - roiMaxYPad, roiMinX + roiMinXPad : roiMaxX - roiMaxXPad,:));
+        roi(roiMinYPad + 1 : size(roi,1) - roiMaxYPad, roiMinXPad + 1 : size(roi,2) - roiMaxXPad, :) = ...
+            double(currentFrame(roiMinY + roiMinYPad : roiMaxY - roiMaxYPad, roiMinX + roiMinXPad : roiMaxX - roiMaxXPad,:));
         
         % Compute bin index map and weighted normalized histogram of the target ROI image
         candidateIdxMap = idxMapFcnHandle(roi, targetModel.histogramBins,  range(1), range(2));
@@ -56,7 +59,8 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
         [roiXgrid, roiYgrid] = meshgrid(roiMinX:roiMaxX, roiMinY:roiMaxY);
         
         % Calculate new position
-        newPosition = round([sum(sum(roiYgrid.*weightsMap.*-kernelDerivative))/weightsMapSum, sum(sum(roiXgrid.*weightsMap.*-kernelDerivative))/weightsMapSum]);
+        newPosition = round([sum(sum(roiYgrid.*weightsMap.*-kernelDerivative))/weightsMapSum, ...
+            sum(sum(roiXgrid.*weightsMap.*-kernelDerivative))/weightsMapSum]);
         
         % Check convergence condition - stop if position shift is smaller
         % than given threshold

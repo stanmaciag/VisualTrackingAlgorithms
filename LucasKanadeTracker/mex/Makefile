@@ -6,11 +6,16 @@ RM = rm -f
 
 default: all
 
-all: bilinearInterpolate
+all: bilinearInterpolate interpolatedGradient
 
 bilinearInterpolate:
 	@echo Compiling binIdxMap MEX...
 	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" bilinearInterpolate_mex.c
+	@echo Done.
+
+interpolatedGradient:
+	@echo Compiling binIdxMap MEX...
+	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" interpolatedGradient_mex.c
 	@echo Done.
 
 clean:

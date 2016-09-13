@@ -1,11 +1,10 @@
-#include <math.h>
-#include "mex.h"
+#include "interpolationEngine.h"
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 
     // Input arguments
-    double *image, *subpixelY, *subpixelX, *pixelY, *pixelX ,*remainderY, *remainderX;
+    double *image, *subpixelY, *subpixelX;
     mwSize imageDims, subpixelYDims, subpixelXDims;
     mwSize imageDim[2];
     
@@ -60,20 +59,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     
     size_t elementNum = mxGetNumberOfElements(prhs[1]);
     
-    double rY, rX, y, x;
     
     for (i = 0; i < elementNum; ++i)
     {
         
-        y = floor(subpixelY[i]);
-        x = floor(subpixelX[i]);
-        rY = subpixelY[i] - y;
-        rX = subpixelX[i] - x;
-        
-        imageInterpolation[i] = (1.0 - rY) * (1.0 - rX) * image[(unsigned)y - 1 + imageDim[0] * ((unsigned)x - 1)] \
-        + rY * (1.0 - rX) * image[(unsigned)y + imageDim[0] * ((unsigned)x - 1)] \
-        + (1.0 - rY) * rX * image[(unsigned)y - 1 + imageDim[0] * (unsigned)x] \
-        + rY * rX * image[(unsigned)y + imageDim[0] * (unsigned)x];
+        imageInterpolation[i] = interpolatePoint(image, imageDim, subpixelY[i] - 1.0, subpixelX[i] - 1.0);
         
     }
    
