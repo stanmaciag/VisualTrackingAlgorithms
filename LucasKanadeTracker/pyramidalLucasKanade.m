@@ -9,25 +9,10 @@ function opticalFlow = pyramidalLucasKanade(previousFrame, currentFrame, ...
     % tracker - Description of the algorithm Intel Corporation - Microprocessor
     % Research Labs, 2000
    
-    % Initialize image pyramids for current and previous frame
-    previousPyramid = zeros(size(previousFrame, 1), size(previousFrame, 2), pyramidDepth + 1);
-    currentPyramid = zeros(size(currentFrame, 1),  size(currentFrame, 2), pyramidDepth + 1);
-    previousPyramid(:,:,1) = previousFrame;
-    currentPyramid(:,:,1) = currentFrame;
-    
-    % Compute image pyramids
-    L = 1;
-    
-    while L < pyramidDepth + 1
-    
-        previousSize = size(previousFrame) / (2 ^ (L - 1));
-        L = L + 1;
-        currentSize = size(previousFrame) / (2 ^ (L - 1));
-        previousPyramid(1:currentSize(1),1:currentSize(2),L) = impyramid(previousPyramid(1:previousSize(1), 1:previousSize(2), L - 1), 'reduce');
-        currentPyramid(1:currentSize(1),1:currentSize(2),L) = impyramid(currentPyramid(1:previousSize(1), 1:previousSize(2), L - 1), 'reduce');
-        
-    end
-
+    % Compute image pyramids for current and previous frame
+    previousPyramid = imagePyramid(double(previousFrame), pyramidDepth);
+    currentPyramid = imagePyramid(double(currentFrame), pyramidDepth);
+   
     % Initialize pyramid optical flow guess and current level guess optical flow 
     pyramidGuessOpticalFlow = zeros([size(pointsToTrack), pyramidDepth + 1]);
     levelOpticalFlow = zeros([size(pointsToTrack), pyramidDepth + 1]);

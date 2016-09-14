@@ -6,7 +6,7 @@ RM = rm -f
 
 default: all
 
-all: bilinearInterpolate interpolatedGradient
+all: bilinearInterpolate interpolatedGradient imagePyramid
 
 bilinearInterpolate:
 	@echo Compiling binIdxMap MEX...
@@ -14,8 +14,13 @@ bilinearInterpolate:
 	@echo Done.
 
 interpolatedGradient:
-	@echo Compiling binIdxMap MEX...
+	@echo Compiling interpolatedGradient MEX...
 	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" interpolatedGradient_mex.c
+	@echo Done.
+
+imagePyramid:
+	@echo Compiling imagePyramid MEX...
+	$(MEX) $(MEXGCC) CFLAGS="$(CFLAGS) $(MEXCFLAGS)" imagePyramid_mex.c
 	@echo Done.
 
 clean:

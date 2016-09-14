@@ -20,7 +20,7 @@ function [currentPosition, candidateModel, orientation, dimensions] = CAMShift(c
     %calculationRegionMaxX = min(size(currentFrame,2), previousPosition(2) + round(candidateModel.horizontalRadious * calculationBandwidth));
     
     % Get extremal coordinates of calculation region (limited by image
-    % boundaries) - calculation region is square, which size is based on
+    % boundaries) - calculation region is square, its size is based on
     % larger candidate's model radious and bandwidth
     maxRadious = max(candidateModel.verticalRadious, candidateModel.horizontalRadious);
     calculationRegionMinY = max(1, previousPosition(1) - round(maxRadious * calculationBandwidth));

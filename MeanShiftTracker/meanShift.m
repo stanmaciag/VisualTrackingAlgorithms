@@ -9,9 +9,16 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
     % Get pixel value range from current frame class
     range = getrangefromclass(currentFrame);
     
+    % Define window search as square, which size is based on larger target
+    % model radious - asserts independance from target's movement direction
+    maxRadious = max(targetModel.horizontalRadious, targetModel.verticalRadious);
+    
+    %[kernelX, kernelY] = meshgrid(-windowBandwidth : 1/targetModel.horizontalRadious : ...
+    %    windowBandwidth, -windowBandwidth : 1/targetModel.verticalRadious : windowBandwidth);
+    
     % Compute kernel matrix
-    [kernelX, kernelY] = meshgrid(-windowBandwidth : 1/targetModel.horizontalRadious : ...
-        windowBandwidth, -windowBandwidth : 1/targetModel.verticalRadious : windowBandwidth);
+    [kernelX, kernelY] = meshgrid(-windowBandwidth : 1/maxRadious : ...
+        windowBandwidth, -windowBandwidth : 1/maxRadious : windowBandwidth);
     kernel = windowProfileFcnHandle(sqrt(((kernelX/windowBandwidth).^2 + (kernelY/windowBandwidth).^2)).^2);
     kernelDerivative = windowDProfileFcnHandle(sqrt(((kernelX/windowBandwidth).^2 + (kernelY/windowBandwidth).^2)).^2);
     
@@ -22,10 +29,14 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
     for i = 1:maxIterations
  
         % Get extremal coordinates of search window
-        roiMinY = currentPosition(1) - round(targetModel.verticalRadious * windowBandwidth);
-        roiMaxY = currentPosition(1) + round(targetModel.verticalRadious * windowBandwidth);
-        roiMinX = currentPosition(2) - round(targetModel.horizontalRadious * windowBandwidth);
-        roiMaxX = currentPosition(2) + round(targetModel.horizontalRadious * windowBandwidth);
+        %roiMinY = currentPosition(1) - round(targetModel.verticalRadious * windowBandwidth);
+        %roiMaxY = currentPosition(1) + round(targetModel.verticalRadious * windowBandwidth);
+        %roiMinX = currentPosition(2) - round(targetModel.horizontalRadious * windowBandwidth);
+        %roiMaxX = currentPosition(2) + round(targetModel.horizontalRadious * windowBandwidth);
+        roiMinY = currentPosition(1) - round(maxRadious * windowBandwidth);
+        roiMaxY = currentPosition(1) + round(maxRadious * windowBandwidth);
+        roiMinX = currentPosition(2) - round(maxRadious * windowBandwidth);
+        roiMaxX = currentPosition(2) + round(maxRadious * windowBandwidth);
         
         % Adjust ROI size to fit kernel
         roiMaxY = roiMaxY - (roiMaxY - roiMinY + 1 - size(kernel,1));
