@@ -11,31 +11,31 @@ function goodFeatures = findGoodFeatures(image, windowRadiousY, windowRadiousX, 
 
     
     % Convert image to double type (avoid numerical error)
-    image = double(image);
+    %image = double(image);
     
     % Convert window size variables to double type (required by Coder's
     % type assertion)
-    windowRadiousY = double(windowRadiousY);
-    windowRadiousX = double(windowRadiousX);
-    
+    %windowRadiousY = double(windowRadiousY);
+    %windowRadiousX = double(windowRadiousX);
+
     % Compute image spatial gradients
     [gradientX, gradientY] = gradient(image);
     
     % Extend image and image gradients with zero-value pixels, border size is defined
     % by search window size - allows to compute Hessian matrix for every
     % actual pixel on the image
-    borderY = zeros(size(image,1), windowRadiousX);
-    borderX = zeros(windowRadiousY, size(image,2) + 2 * windowRadiousX);
+    %borderY = zeros(size(image,1), windowRadiousX);
+    %borderX = zeros(windowRadiousY, size(image,2) + 2 * windowRadiousX);
     
-    image = [borderX; borderY, image, borderY; borderX];
-    gradientY = [borderX; borderY, gradientY, borderY; borderX];
-    gradientX = [borderX; borderY, gradientX, borderY; borderX];
+    %image = [borderX; borderY, image, borderY; borderX];
+    %gradientY = [borderX; borderY, gradientY, borderY; borderX];
+    %gradientX = [borderX; borderY, gradientX, borderY; borderX];
     
     minEigenval = zeros(size(image));
     
-    for j = 1 + windowRadiousY : size(image, 1) - windowRadiousY
+    for j = 2 + windowRadiousY : size(image, 1) - windowRadiousY - 1
        
-        for i = 1 + windowRadiousX : size(image, 2) - windowRadiousX
+        for i = 2 + windowRadiousX : size(image, 2) - windowRadiousX - 1
     
             
             gradientYWindow = gradientY(j - windowRadiousY : j + windowRadiousY, i - windowRadiousX : i + windowRadiousX);
@@ -60,7 +60,6 @@ function goodFeatures = findGoodFeatures(image, windowRadiousY, windowRadiousX, 
         end
         
     end
-
     
     maxMinEigenval = max(max(minEigenval));
     
