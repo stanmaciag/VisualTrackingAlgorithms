@@ -9,6 +9,10 @@ if ~exist('camera','var');
 end
 
 
+
+videoPlayer  = vision.VideoPlayer('Position',...
+    [100 100 [size(currentFrame, 2), size(currentFrame, 1)]+30]);
+
 %% Select ROI
 
 roiCaptured = false;
@@ -100,23 +104,23 @@ end
 
 tracker = trackingModule.LucasKanadeTracker;
 
-tracker.focus(currentFrame, roiRect);
+tracker.setParameter('MaxTrackingAffineDistortion',4);
+tracker.setParameter('MinFeatureDistance',3);
+tracker.setParameter('DestFeatures',40);
+tracker.setParameter('UpdateThreshold', 0.8);
+tracker.setParameter('EigRetainThreshold',0.1);
 
-tracker.setParameter('MaxTrackingAffineDistortion',5);
-tracker.setParameter('MinFeatureDistance',2);
-tracker.setParameter('MaxFeaturesCount',40);
-tracker.setParameter('UpdateThreshold',15);
-%tracker.setParameter('EigRetainCoeff',0.01);
+tracker.focus(currentFrame, roiRect);
 
 
 %%
 
 while tracker.getStatus
     
-    tic;
+    
     currentFrame = snapshot(camera);
     
-    
+    tic;
     
     tracker.track(currentFrame);
     
@@ -143,17 +147,18 @@ while tracker.getStatus
     
     p = tracker.getBoundingPolygon;
     
-    
+    currentTime = toc;
     
     currentFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');
     
     currentFrame = insertText(currentFrame, [10, 30], [num2str(tracker.getSimilarity * 100), '%']); 
     currentFrame = insertMarker(currentFrame, tracker.getTrackedFeatures, '+', 'Color', 'blue');
-    currentFrame = insertShape(currentFrame, 'Polygon', [p(1), p(2), p(1), p(2), p(1), p(2), p(1), p(2)], 'Color', 'green');
+    %currentFrame = insertShape(currentFrame, 'Polygon', [p(1), p(2), p(1), p(2), p(1), p(2), p(1), p(2)], 'Color', 'green');
     
-    currentTime = toc;
+    
     currentFrame = insertText(currentFrame, [10, 10], [num2str(1/currentTime), ' fps']);
-    imshow(currentFrame);
+    %imshow(currentFrame);
 
+    step(videoPlayer, currentFrame);
     
 end

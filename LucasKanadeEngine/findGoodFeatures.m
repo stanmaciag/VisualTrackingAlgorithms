@@ -1,4 +1,5 @@
-function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, windowRadiousX, maxEigRetainThreshold, minThresholdDistance, initialFeatures)
+function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, windowRadiousX, ...
+    maxEigRetainThreshold, minThresholdDistance, initialFeatures)
 %FINDGOODFEATURES Extract good features to track from given image
 % GOODFEATURES = FINDGOODFEATURES(IMAGE) 
 % References
@@ -39,7 +40,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
     minEigenval = reshape(minEigenval, size(windowCenterX));
     
     % Clear unused variables
-    clear windowPixelsX windowPixelsY gradientMomentXX gradientMomentXY gradientMomentYY hessian hessianDet hessianTr;
+    clear windowPixelsX windowPixelsY initialDsplX initialDsplY gradientMomentXX gradientMomentXY gradientMomentYY hessian hessianDet hessianTr;
     
     % Find maximum value of minimal eigenvalues of Hessian in the given
     % image
@@ -84,19 +85,33 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
         minEigenval(goodFeaturesIdx) > eigNeighbor_x1yn1;
     
     goodFeaturesIdx = find(isGoodFeature);
+
+    initialMap = false(size(isGoodFeature));
+    
+    if (nargin > 5)
+        
+        initialFeatures = initialFeatures(initialFeatures(:,1) >= windowRadiousX + 2 & ...
+                initialFeatures(:,2) >= windowRadiousY + 2 & initialFeatures(:,1) <= size(image,2) - windowRadiousX - 1 & ...
+                initialFeatures(:,2) <= size(image,1) - windowRadiousY - 1, :);
+            
+        initialFeatures(:,1) = initialFeatures(:,1) - (windowRadiousX + 2) + 1;
+        initialFeatures(:,2) = initialFeatures(:,2) - (windowRadiousY + 2) + 1;
+        initialMap(initialFeatures(:,2) + rows * (initialFeatures(:,1) - 1)) = true;
+        
+    end
     
     % Compute proximity map
-    map = proximityMap_mex(isGoodFeature, minThresholdDistance);
+    map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
     featureProximity = map(goodFeaturesIdx);
     
     % While distances between all features are not above given threshold
-    while max(featureProximity) > 1
+    while ~isempty(featureProximity) && max(featureProximity) > 1
        
         % Reject features that cause most proximity conflicts
         maxIdx = featureProximity == max(featureProximity);
         isGoodFeature(goodFeaturesIdx(maxIdx)) = false;
         goodFeaturesIdx = find(isGoodFeature);
-        map = proximityMap_mex(isGoodFeature, minThresholdDistance);
+        map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
         featureProximity = map(goodFeaturesIdx);
         
     end

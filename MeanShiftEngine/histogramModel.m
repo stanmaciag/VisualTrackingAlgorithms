@@ -33,8 +33,8 @@ idxMapFcnHandle, histogramFcnHandle)
     range = getrangefromclass(targetImage);
     
     % Compute bin index map and weighted histogram of the target ROI image
-    model.binIdxMap = idxMapFcnHandle(double(targetImage), histogramBins,  range(1), range(2));
-    model.histogram = histogramFcnHandle(double(targetImage), kernel, model.binIdxMap, histogramBins);
+    model.binIdxMap = binIdxMap_mex(double(targetImage), histogramBins,  range(1), range(2));
+    model.histogram = weightedHistogram_mex(double(targetImage), kernel, model.binIdxMap, histogramBins);
     model.histogramBins = histogramBins;
     
 end

@@ -12,7 +12,6 @@ bins = [32; 16; 16];
 computationRegionBandwidth = 3;
 maxIterations = 10;
 threshold = 1;
-minRadious = 20;
 scalingFactor = 0.1;
 modelBandwidth = 2;
 
@@ -33,7 +32,7 @@ roi = currentFrameHSV(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) 
 
 %%
 tic
-targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins, idxMapFcnHandle, histogramFcnHandle);
+targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins);
 %targetModel = ratioHistogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, @backgorundScalingProfile, bins, ...
 %    modelBandwidth, scalingFactor, idxMapFcnHandle, histogramFcnHandle);
 toc
@@ -62,7 +61,7 @@ while ~isDone(videoFileReader)
     tic;
     [currentPosition, targetModel, theta, dimensions] = ...
         CAMShift(currentFrameHSV, targetModel, currentPosition, computationRegionBandwidth, ...
-        maxIterations, threshold, minRadious, idxMapFcnHandle);
+        maxIterations, threshold);
     
     currentTime = toc;
     

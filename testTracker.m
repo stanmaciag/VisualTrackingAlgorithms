@@ -27,9 +27,11 @@ tracker = trackingModule.LucasKanadeTracker;
 
 tracker.focus(currentFrame, roiRect);
 
-tracker.setParameter('MaxTrackingAffineDistortion',5);
+tracker.setParameter('MaxTrackingAffineDistortion',4);
 tracker.setParameter('MinFeatureDistance',1);
-tracker.setParameter('EigRetainCoeff',0.05);
+tracker.setParameter('EigRetainCoeff',0.1);
+tracker.setParameter('MaxFeaturesCount',40);
+tracker.setParameter('UpdateThreshold',35);
 
 framesCount = 0;
 minTime = Inf;
