@@ -1,5 +1,4 @@
-function model = histogramModel(image, targetRoi, windowProfileFcnHandle, histogramBins, ...
-idxMapFcnHandle, histogramFcnHandle)
+function model = histogramModel(image, targetRoi, windowProfileFcnHandle, histogramBins)
 
     image = double(image);
 

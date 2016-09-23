@@ -10,7 +10,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
 % tracker - Description of the algorithm Intel Corporation - Microprocessor
 % Research Labs, 2000
     
-    % Find extract windows centers for given image
+    % Find extract windows for given image
     [windowCenterX, windowCenterY] = meshgrid(windowRadiousX + 2 : size(image,2) - windowRadiousX - 1, windowRadiousY + 2:size(image,1) - windowRadiousY - 1);
     [windowPixelsX, windowPixelsY] = meshgrid(-windowRadiousX : windowRadiousX, -windowRadiousY : windowRadiousY);
     windowPixelsX = repmat(windowPixelsX, 1, 1, (size(image,1) - 2 * windowRadiousY - 2) * (size(image,2) - 2 * windowRadiousX - 2));
@@ -40,7 +40,8 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
     minEigenval = reshape(minEigenval, size(windowCenterX));
     
     % Clear unused variables
-    clear windowPixelsX windowPixelsY initialDsplX initialDsplY gradientMomentXX gradientMomentXY gradientMomentYY hessian hessianDet hessianTr;
+    clear windowPixelsX windowPixelsY initialDsplX initialDsplY gradientMomentXX ...
+        gradientMomentXY gradientMomentYY hessian hessianDet hessianTr;
     
     % Find maximum value of minimal eigenvalues of Hessian in the given
     % image
@@ -50,7 +51,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
     % percentage of global maxium minimal eigenvalue
     isGoodFeature = imag(minEigenval) == 0 & minEigenval > maxEigRetainThreshold * maxMinEigenval;
     
-    % Reject features of image egdes
+    % Reject features on image egdes
     isGoodFeature(1,:) = false;
     isGoodFeature(:,1) = false;
     isGoodFeature(end,:) = false;
@@ -83,8 +84,6 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
         minEigenval(goodFeaturesIdx) > eigNeighbor_xn1yn1 & ...
         minEigenval(goodFeaturesIdx) > eigNeighbor_x0yn1 & ...
         minEigenval(goodFeaturesIdx) > eigNeighbor_x1yn1;
-    
-    goodFeaturesIdx = find(isGoodFeature);
 
     initialMap = false(size(isGoodFeature));
     
@@ -102,24 +101,28 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
     
     % Compute proximity map
     map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
-    featureProximity = map(goodFeaturesIdx);
+    featureProximity = map(isGoodFeature);
+    maximumProxmitiy = max(featureProximity);
     
     % While distances between all features are not above given threshold
-    while ~isempty(featureProximity) && max(featureProximity) > 1
-       
-        % Reject features that cause most proximity conflicts
-        maxIdx = featureProximity == max(featureProximity);
-        isGoodFeature(goodFeaturesIdx(maxIdx)) = false;
-        goodFeaturesIdx = find(isGoodFeature);
-        map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
-        featureProximity = map(goodFeaturesIdx);
+    while nnz(isGoodFeature) > 0 && maximumProxmitiy > 1
         
+        % Reject features that cause most proximity conflicts
+        maxIdx = featureProximity == maximumProxmitiy;
+        isGoodFeature(goodFeaturesIdx(maxIdx)) = false;
+        
+        % Compute proximity map
+        map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
+        goodFeaturesIdx = find(isGoodFeature);
+        featureProximity = map(goodFeaturesIdx);
+        maximumProxmitiy = max(featureProximity);
+
     end
  
     goodFeaturesIdx  = find(isGoodFeature);
     
     % Get final good features locations and their minimal eigenvals
-    goodFeatures = [windowCenterX(goodFeaturesIdx), windowCenterY(goodFeaturesIdx)];
+    goodFeatures = [windowCenterX(goodFeaturesIdx) - windowRadiousX - 1, windowCenterY(goodFeaturesIdx)  - windowRadiousY - 1];
     minEigenvals = minEigenval(goodFeaturesIdx);
     
 end

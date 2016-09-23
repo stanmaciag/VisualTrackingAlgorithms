@@ -105,7 +105,7 @@ end
 tracker = trackingModule.LucasKanadeTracker;
 
 tracker.setParameter('MaxTrackingAffineDistortion',4);
-tracker.setParameter('MinFeatureDistance',3);
+tracker.setParameter('MinFeatureDistance',5);
 tracker.setParameter('DestFeatures',40);
 tracker.setParameter('UpdateThreshold', 0.8);
 tracker.setParameter('EigRetainThreshold',0.1);
@@ -152,7 +152,7 @@ while tracker.getStatus
     currentFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');
     
     currentFrame = insertText(currentFrame, [10, 30], [num2str(tracker.getSimilarity * 100), '%']); 
-    currentFrame = insertMarker(currentFrame, tracker.getTrackedFeatures, '+', 'Color', 'blue');
+    currentFrame = insertMarker(currentFrame, tracker.getTargetFeatures, '+', 'Color', 'blue');
     %currentFrame = insertShape(currentFrame, 'Polygon', [p(1), p(2), p(1), p(2), p(1), p(2), p(1), p(2)], 'Color', 'green');
     
     

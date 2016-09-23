@@ -8,7 +8,7 @@ videoFileReader = vision.VideoFileReader('tilted_face.avi');
 currentFrame = step(videoFileReader);
 currentFrameHSV = rgb2hsv(currentFrame);
 
-bins = [32; 16; 16];
+bins = [16; 8; 8];
 computationRegionBandwidth = 3;
 maxIterations = 10;
 threshold = 1;

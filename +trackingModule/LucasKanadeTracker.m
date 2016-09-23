@@ -65,7 +65,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
         previousFrame;
         
         % Tracked features set
-        trackedFeatures;
+        targetFeatures;
         % Miminal features eigenvalues
         featuresEigenvals;
         % Bounding polygon of tracked object
@@ -112,10 +112,10 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             isPositiveNumeric = @(x) isnumeric(x) && isscalar(x) && isfinite(x) && x > 0;
 
             % Define allowed parameters and their constraints
-            addParameter(parameterParser, 'TrackWindowRadiousX', obj.trackWindowRadiousX, @(x) assert(isPositiveInteger(x) && mod(x) == 1, ...
-                'Tracking window radious must be positive odd integer'));
-            addParameter(parameterParser, 'TrackWindowRadiousY', obj.trackWindowRadiousY, @(x) assert(isPositiveInteger(x) && mod(x) == 1, ...
-                'Tracking window radious must be positive odd integer'));
+            addParameter(parameterParser, 'TrackWindowRadiousX', obj.trackWindowRadiousX, @(x) assert(isPositiveInteger(x), ...
+                'Tracking window radious must be positive integer'));
+            addParameter(parameterParser, 'TrackWindowRadiousY', obj.trackWindowRadiousY, @(x) assert(isPositiveInteger(x), ...
+                'Tracking window radious must be positive integer'));
             addParameter(parameterParser, 'StopThreshold', obj.stopThreshold, @(x) assert(isPositiveNumeric(x), ...
                 'Stop threshold value must be positive numeric'));
             addParameter(parameterParser, 'MaxIterations', obj.maxIterations, @(x) assert(isPositiveInteger(x), ...
@@ -124,10 +124,10 @@ classdef LucasKanadeTracker < trackingModule.Tracker
                 'Pyramid depth must be positive integer'));
             addParameter(parameterParser, 'MinHessianDet', obj.minHessianDet, @(x) assert(isPositiveNumeric(x), ...
                 'Minimal feature Hessian determinant value must be positive numeric'));
-            addParameter(parameterParser, 'ExtractWindowRadiousX', obj.extractWindowRadiousX, @(x) assert(isPositiveInteger(x) && mod(x) == 1, ...
-                'Extraction window radious must be positive odd integer'));
-            addParameter(parameterParser, 'ExtractWindowRadiousY', obj.extractWindowRadiousY, @(x) assert(isPositiveInteger(x) && mod(x) == 1, ...
-                'Extraction window radious must be positive odd integer'));
+            addParameter(parameterParser, 'ExtractWindowRadiousX', obj.extractWindowRadiousX, @(x) assert(isPositiveInteger(x), ...
+                'Extraction window radious must be positive integer'));
+            addParameter(parameterParser, 'ExtractWindowRadiousY', obj.extractWindowRadiousY, @(x) assert(isPositiveInteger(x), ...
+                'Extraction window radious must be positive integer'));
             addParameter(parameterParser, 'EigRetainThreshold', obj.eigRetainThreshold, @(x) assert(isPositiveNumeric(x) && x <= 1, ...
                 'Feature extraction eigenvalue retain threshold must be positive numeric less or equal to 1'));
             addParameter(parameterParser, 'MinFeatureDistance', obj.minFeatureDistance, @(x) assert(isPositiveNumeric(x), ...
@@ -169,6 +169,11 @@ classdef LucasKanadeTracker < trackingModule.Tracker
         % by passed parameters)
         function obj = LucasKanadeTracker(varargin)
            
+            % Initialize object state
+            obj = obj@trackingModule.Tracker;
+            obj.boundingPolygon = zeros(4, 2);
+            
+            % Initialize tracking parameters
             obj.trackWindowRadiousX = obj.defaultTrackWindowRadiousX;
             obj.trackWindowRadiousY = obj.defaultTrackWindowRadiousY;
             obj.stopThreshold = obj.defaultStopThreshold;
@@ -184,8 +189,8 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             obj.destFeatures = obj.defaultDestFeatures;
             obj.updateThreshold = obj.defaultUpdateThreshold;
             obj.autoUpdate = obj.defaultAutoUpdate;
-            obj.status = false;
             
+            % Modify parameters
             setParameter(obj, varargin{:});
 
         end
@@ -215,30 +220,30 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             % Extract ROI from current frame
             roi = obj.currentFrame(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) + roiRect(3));
             % Find good features to track in selected ROI
-            [obj.trackedFeatures, obj.featuresEigenvals] = findGoodFeatures(roi, obj.extractWindowRadiousY, ...
+            [obj.targetFeatures, obj.featuresEigenvals] = findGoodFeatures(roi, obj.extractWindowRadiousY, ...
                 obj.extractWindowRadiousY, obj.eigRetainThreshold, obj.minFeatureDistance);
             
             % If found features quantity is greater than destined features
             % quantity select the strongest (with the greates minimal
             % eigenvalue)
-            if (size(obj.trackedFeatures, 1) > obj.destFeatures)
+            if (size(obj.targetFeatures, 1) > obj.destFeatures)
                
                 % Sort features descendingly by their minimal eigenvalues
                 [obj.featuresEigenvals, sortIdx] = sort(obj.featuresEigenvals, 'descend');
-                obj.trackedFeatures = obj.trackedFeatures(sortIdx, :);
+                obj.targetFeatures = obj.targetFeatures(sortIdx, :);
                 % Retain destined quantity of features
-                obj.trackedFeatures = obj.trackedFeatures(1:obj.destFeatures,:);
+                obj.targetFeatures = obj.targetFeatures(1:obj.destFeatures,:);
                 obj.featuresEigenvals = obj.featuresEigenvals(1:obj.destFeatures,:);
                 
             end
             
             % Covert features coordinate from local (ROI's) to
             % global (frame's)
-            obj.trackedFeatures(:,1) = obj.trackedFeatures(:,1) + roiRect(1) - 1;
-            obj.trackedFeatures(:,2) = obj.trackedFeatures(:,2) + roiRect(2) - 1;
+            obj.targetFeatures(:,1) = obj.targetFeatures(:,1) + roiRect(1) - 1;
+            obj.targetFeatures(:,2) = obj.targetFeatures(:,2) + roiRect(2) - 1;
             
             % Fail if features quantity is less than minimal
-            if size(obj.trackedFeatures, 1) < obj.minFeatures
+            if size(obj.targetFeatures, 1) < obj.minFeatures
                
                 obj.status = false;
                 obj.similarity = 0;
@@ -248,7 +253,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
                 
                 obj.status = true;
                 % Measure similarity as current to destined features quantity ratio
-                obj.similarity = size(obj.trackedFeatures,1) / obj.destFeatures;
+                obj.similarity = size(obj.targetFeatures,1) / obj.destFeatures;
                 
             end
             
@@ -271,7 +276,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             
             % Fail if tracked features quantity is less than minimal
             % (especially if no features were selected)
-            if size(obj.trackedFeatures, 1) < obj.minFeatures
+            if size(obj.targetFeatures, 1) < obj.minFeatures
                 
                 obj.status = false;
                 obj.similarity = 0;
@@ -284,18 +289,18 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             
             % Estimate optical flow of tracked features
             [flow, trackingSuccessful] = pyramidalLucasKanade(obj.previousFrame, obj.currentFrame, ...
-                obj.trackedFeatures, obj.trackWindowRadiousY, obj.trackWindowRadiousY, ...
+                obj.targetFeatures, obj.trackWindowRadiousY, obj.trackWindowRadiousY, ...
                 obj.maxIterations, obj.stopThreshold, obj.pyramidDepth, obj.minHessianDet, ...
                 @inverseCompostionalLK, @gaussianKernel);
 
             % Retain only successfully tracked features (not degenerated
             % and not out of image bounds)
-            obj.trackedFeatures = obj.trackedFeatures(trackingSuccessful, :);
+            obj.targetFeatures = obj.targetFeatures(trackingSuccessful, :);
             obj.featuresEigenvals = obj.featuresEigenvals(trackingSuccessful, :);
             flow = flow(trackingSuccessful, :);
 
             % Fail if tracked features quantity is less than minimal
-            if size(obj.trackedFeatures, 1) < obj.minFeatures
+            if size(obj.targetFeatures, 1) < obj.minFeatures
                 
                 obj.status = false;
                 obj.similarity = 0;
@@ -305,11 +310,11 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             
             % Estimate current position as previos translated by optical
             % flow
-            previousFeatures = obj.trackedFeatures;
-            obj.trackedFeatures = obj.trackedFeatures + flow;
+            previousFeatures = obj.targetFeatures;
+            obj.targetFeatures = obj.targetFeatures + flow;
             
             % Compute affine transformation matrix between current and previous features 
-            [affineMatrix, inlinersIdx, distance]  = fitHomography(previousFeatures, obj.trackedFeatures, ...
+            [affineMatrix, inlinersIdx, distance]  = fitHomography(previousFeatures, obj.targetFeatures, ...
                 obj.maxTrackingAffineDistortion, @computeAffine);
  
             % Fail if quantity of current features that are fitting stated
@@ -324,7 +329,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             
             % Retain only features that fits stated affine transformation
             % (with certain given tolerance)
-            obj.trackedFeatures = obj.trackedFeatures(inlinersIdx,:);
+            obj.targetFeatures = obj.targetFeatures(inlinersIdx,:);
             obj.featuresEigenvals = obj.featuresEigenvals(inlinersIdx, :);
            
             % Compute current model similarity according to percentile
@@ -332,7 +337,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             % their position that fits affine model ideally and current
             % to destined features quantity ratio 
             obj.similarity = (1 - (sum(distance(inlinersIdx) / obj.maxTrackingAffineDistortion) ...
-                / size(obj.trackedFeatures,1))) * size(obj.trackedFeatures,1) / obj.destFeatures;
+                / size(obj.targetFeatures,1))) * size(obj.targetFeatures,1) / obj.destFeatures;
             
             % Transform bounding polygon
             obj.boundingPolygon = applyHomography(obj.boundingPolygon, affineMatrix);
@@ -358,7 +363,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             
             % Update object model if auto-updating is enabled and current to 
             % destined features quantity ratio is less or equal to threshold
-            if obj.autoUpdate && size(obj.trackedFeatures, 1) / obj.destFeatures <= obj.updateThreshold
+            if obj.autoUpdate && size(obj.targetFeatures, 1) / obj.destFeatures <= obj.updateThreshold
             
                 obj.update;
                 
@@ -367,12 +372,12 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             
         end
 
-        
+        % Update object's model
         function obj = update(obj)
         
             % Compute quanitiy of features that are needed to achive
             % destined features set size
-            supplementSize = obj.destFeatures - size(obj.trackedFeatures,1);
+            supplementSize = obj.destFeatures - size(obj.targetFeatures,1);
             
             % Finish if no features need to be appended
             if supplementSize == 0
@@ -388,17 +393,16 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             maxX = min(size(obj.currentFrame, 2), ceil(max(obj.boundingPolygon(:,1))));
             maxY = min(size(obj.currentFrame, 1), ceil(max(obj.boundingPolygon(:,2))));
             
-            % Bounding polygon coordinates may be non-integer, round if
-            % neccessary
-            roiRect = round([minX, minY, maxX - minX, maxY - minY]);
+            % Determine ROI bounding rectangle
+            roiRect = [minX, minY, maxX - minX, maxY - minY];
             
             % Round current tracked positions
-            initialFeatures = round(obj.trackedFeatures);
+            initialFeatures = round(obj.targetFeatures);
             
             % Select features that lies inside bounding rectangle
-            initialFeatures = initialFeatures(initialFeatures(:,1) >= roiRect(1) & ...
-                initialFeatures(:,2) >= roiRect(2) & initialFeatures(:,1) <= roiRect(1) & ...
-                initialFeatures(:,2) <= roiRect(2), :);
+            initialFeatures = initialFeatures(initialFeatures(:,1) >= minX & ...
+                initialFeatures(:,2) >= minY & initialFeatures(:,1) <= maxX & ...
+                initialFeatures(:,2) <= maxY, :);
             
             % Convert features coordinates from global (on image) to local
             % (in bounding rectangle)
@@ -441,27 +445,17 @@ classdef LucasKanadeTracker < trackingModule.Tracker
                 end
 
                 % Append new features to tracked features set
-                obj.trackedFeatures = [obj.trackedFeatures; newFeatures];
+                obj.targetFeatures = [obj.targetFeatures; newFeatures];
                 obj.featuresEigenvals = [obj.featuresEigenvals; newEigenvals];
 
                 % Fail if tracked features quantity is less than minimal
-                if (size(obj.trackedFeatures, 1) < obj.minFeatures)
+                if (size(obj.targetFeatures, 1) < obj.minFeatures)
 
                     obj.status = false;
                     obj.similarity = 0;
                     return;
 
                 else
-
-                    %if (size(obj.trackedFeatures, 1) > obj.destFeatures)
-
-
-                    %   [obj.featuresEigenvals, sortIdx] = sort(obj.featuresEigenvals, 'descend');
-                    %    obj.trackedFeatures = obj.trackedFeatures(sortIdx, :);
-                    %    obj.trackedFeatures = obj.trackedFeatures(1:obj.destFeatures, :);
-                    %    obj.featuresEigenvals = obj.featuresEigenvals(1:obj.destFeatures,:);
-
-                    %end
 
                     obj.status = true;
                     
@@ -472,9 +466,9 @@ classdef LucasKanadeTracker < trackingModule.Tracker
         end
         
         % Get currently tracked features positions and minimal eigenvalues
-        function [features, eigenvals] = getTrackedFeatures(obj)
+        function [features, eigenvals] = getTargetFeatures(obj)
            
-            features = obj.trackedFeatures;
+            features = obj.targetFeatures;
             eigenvals = obj.featuresEigenvals;
             
         end

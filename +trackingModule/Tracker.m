@@ -35,6 +35,16 @@ classdef Tracker < handle
    
     methods
         
+        function obj = Tracker
+           
+            obj.position = [0, 0];
+            obj.orientation = 0;
+            obj.dimensions = [0, 0];
+            obj.status = false;
+            obj.similarity = 0;
+            
+        end
+        
         function currentPosition = getPosition(obj)
            
             currentPosition = obj.position;
