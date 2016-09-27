@@ -99,6 +99,9 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
         
     end
     
+    % Reject features that coincide with initial features
+    isGoodFeature = isGoodFeature & ~initialMap;
+    
     % Compute proximity map
     map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
     featureProximity = map(isGoodFeature);
@@ -122,7 +125,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
     goodFeaturesIdx  = find(isGoodFeature);
     
     % Get final good features locations and their minimal eigenvals
-    goodFeatures = [windowCenterX(goodFeaturesIdx) - windowRadiousX - 1, windowCenterY(goodFeaturesIdx)  - windowRadiousY - 1];
+    goodFeatures = [windowCenterX(goodFeaturesIdx), windowCenterY(goodFeaturesIdx)];
     minEigenvals = minEigenval(goodFeaturesIdx);
     
 end

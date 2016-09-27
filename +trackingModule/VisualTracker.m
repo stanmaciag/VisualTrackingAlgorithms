@@ -1,41 +1,42 @@
-classdef Tracker < handle
+classdef VisualTracker < handle
     
-    properties (SetAccess = protected, GetAccess = protected)
+    properties (Access = protected)
         
         % Last tracked object's position
-        position
+        position;
         
         % Last tracked object's orientation
-        orientation
+        orientation;
         
         % Last tracked object's dimensions
-        dimensions
+        dimensions;
         
         % Tracking status
-        status
+        status;
         
         % Object similarity 
-        similarity
+        similarity;
         
     end
     
-    methods (Abstract)
+    methods (Abstract, Access = public)
 
         % Select object of interest as content of given region of interest
         % and compute its model
-        focus(obj, frame, roiRect)
+        focus(obj, frame, roiRect);
         
         % Track object on new frame
-        track(obj, frame)
+        track(obj, frame);
         
         % Update object model with information delivered by last frame
-        update(obj)
+        update(obj);
         
     end
-   
+    
+    
     methods
         
-        function obj = Tracker
+        function obj = VisualTracker
            
             obj.position = [0, 0];
             obj.orientation = 0;

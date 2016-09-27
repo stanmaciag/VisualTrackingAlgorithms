@@ -32,11 +32,11 @@ roi = currentFrameHSV(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) 
 
 %%
 tic
-targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins);
+targetModel = histogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, bins, histogramFcnHandle);
 %targetModel = ratioHistogramModel(currentFrameHSV, roiRect, @epanechnikovProfile, @backgorundScalingProfile, bins, ...
 %    modelBandwidth, scalingFactor, idxMapFcnHandle, histogramFcnHandle);
 toc
-targetPosition = [round(roiRect(2) + roiRect(4)/2), round(roiRect(1) + roiRect(3)/2)];
+targetPosition = [round(roiRect(1) + roiRect(3)/2), round(roiRect(2) + roiRect(4)/2)];
 
 %%
 
@@ -71,22 +71,22 @@ while ~isDone(videoFileReader)
     %p2 = [dimensions(2); -dimensions(1)];
     %p3 = [-dimensions(2); -dimensions(1)];
     %p4 = [-dimensions(2); dimensions(1)];
-    p1 = [dimensions(1); dimensions(2)];
-    p2 = [dimensions(1); -dimensions(2)];
-    p3 = [-dimensions(1); -dimensions(2)];
-    p4 = [-dimensions(1); dimensions(2)];
+    p1 = [dimensions(2); dimensions(1)];
+    p2 = [dimensions(2); -dimensions(1)];
+    p3 = [-dimensions(2); -dimensions(1)];
+    p4 = [-dimensions(2); dimensions(1)];
     
     p1 = rotMatrix*p1;
     p2 = rotMatrix*p2;
     p3 = rotMatrix*p3;
     p4 = rotMatrix*p4;
     
-    p1 = round([p1(1) + currentPosition(2); p1(2) + currentPosition(1)]);
-    p2 = round([p2(1) + currentPosition(2); p2(2) + currentPosition(1)]);
-    p3 = round([p3(1) + currentPosition(2); p3(2) + currentPosition(1)]);
-    p4 = round([p4(1) + currentPosition(2); p4(2) + currentPosition(1)]);
+    p1 = round([p1(1) + currentPosition(1); p1(2) + currentPosition(2)]);
+    p2 = round([p2(1) + currentPosition(1); p2(2) + currentPosition(2)]);
+    p3 = round([p3(1) + currentPosition(1); p3(2) + currentPosition(2)]);
+    p4 = round([p4(1) + currentPosition(1); p4(2) + currentPosition(2)]);
     
-    boundingRect = [currentPosition(2) - targetModel.horizontalRadious , currentPosition(1) - targetModel.verticalRadious, ...
+    boundingRect = [currentPosition(1) - targetModel.horizontalRadious , currentPosition(2) - targetModel.verticalRadious, ...
         2 * targetModel.horizontalRadious + 1, 2 * targetModel.verticalRadious + 1];
   
     currentFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');

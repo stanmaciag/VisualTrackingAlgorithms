@@ -8,17 +8,16 @@ if ~exist('camera','var');
     camera = webcam;
 end
 
-
-
-videoPlayer  = vision.VideoPlayer('Position',...
-    [100 100 [size(currentFrame, 2), size(currentFrame, 1)]+30]);
-
 %% Select ROI
 
 roiCaptured = false;
 
 currentFrame = snapshot(camera);
 iptsetpref('ImshowBorder','tight');
+
+videoPlayer  = vision.VideoPlayer('Position',...
+    [100 100 [size(currentFrame, 2), size(currentFrame, 1)]+30]);
+
 
 frameHandle = figure;
 imshow(currentFrame);
@@ -102,20 +101,27 @@ end
 
 %% Compute object model
 
-tracker = trackingModule.LucasKanadeTracker;
+%tracker = trackingModule.LucasKanadeTracker;
 
-tracker.setParameter('MaxTrackingAffineDistortion',4);
-tracker.setParameter('MinFeatureDistance',5);
-tracker.setParameter('DestFeatures',40);
-tracker.setParameter('UpdateThreshold', 0.8);
-tracker.setParameter('EigRetainThreshold',0.1);
+%tracker.setParameter('MaxTrackingAffineDistortion',4);
+%tracker.setParameter('MinFeatureDistance',5);
+%tracker.setParameter('DestFeatures',40);
+%tracker.setParameter('UpdateThreshold', 0.8);
+%tracker.setParameter('EigRetainThreshold',0.1);
+
+tracker = trackingModule.CAMShiftTracker;
+%tracker.setParameter('BackgroundCancel',true);
+
+%tracker = trackingModule.MeanShiftTracker;
+
+%tracker.setParameter('ModelBins',[16,16,16]);
+%tracker.setParameter('BandwidthCompRegion',8);
+%tracker.setParameter('BackgroundCancel',true);
 
 tracker.focus(currentFrame, roiRect);
-
-
 %%
 
-while tracker.getStatus
+while 1
     
     
     currentFrame = snapshot(camera);
@@ -145,14 +151,13 @@ while tracker.getStatus
     p3 = round([p3(1) + currentPosition(1); p3(2) + currentPosition(2)]);
     p4 = round([p4(1) + currentPosition(1); p4(2) + currentPosition(2)]);
     
-    p = tracker.getBoundingPolygon;
+    %p = tracker.getBoundingPolygon;
     
     currentTime = toc;
     
-    currentFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');
-    
+    currentFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');    
     currentFrame = insertText(currentFrame, [10, 30], [num2str(tracker.getSimilarity * 100), '%']); 
-    currentFrame = insertMarker(currentFrame, tracker.getTargetFeatures, '+', 'Color', 'blue');
+    %currentFrame = insertMarker(currentFrame, tracker.getTargetFeatures, '+', 'Color', 'blue');
     %currentFrame = insertShape(currentFrame, 'Polygon', [p(1), p(2), p(1), p(2), p(1), p(2), p(1), p(2)], 'Color', 'green');
     
     

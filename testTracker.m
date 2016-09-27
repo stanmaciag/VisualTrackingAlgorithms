@@ -7,13 +7,13 @@ close all;
 videoFileReader = vision.VideoFileReader('tilted_face.avi');
 currentFrame = step(videoFileReader);
 %currentFrameGray = rgb2gray(step(videoFileReader));
-currentFrame = currentFrame(:, 1:520);
+%currentFrame = currentFrame(:, 1:520);
 
 %%
 
 h = imshow(currentFrame);
-%roiRect = round(getrect);
-roiRect = [258, 61, 142, 159];
+roiRect = round(getrect);
+%roiRect = [258, 61, 142, 159];
 %roiRect = [270, 100, 30, 30];
 hold on;
 rectangle('Position',roiRect);
@@ -25,13 +25,19 @@ videoPlayer  = vision.VideoPlayer('Position',...
 
 tracker = trackingModule.LucasKanadeTracker;
 
-tracker.focus(currentFrame, roiRect);
+
 
 tracker.setParameter('MaxTrackingAffineDistortion',4);
 tracker.setParameter('MinFeatureDistance',1);
-tracker.setParameter('EigRetainCoeff',0.1);
-tracker.setParameter('MaxFeaturesCount',40);
-tracker.setParameter('UpdateThreshold',35);
+tracker.setParameter('EigRetainThreshold',0.1);
+tracker.setParameter('DestFeatures',40);
+tracker.setParameter('UpdateThreshold',0.8);
+
+%tracker = trackingModule.CAMShiftTracker;
+%tracker.setParameter('AutoUpdate',false);
+
+
+tracker.focus(currentFrame, roiRect);
 
 framesCount = 0;
 minTime = Inf;
@@ -43,7 +49,7 @@ while ~isDone(videoFileReader)
     framesCount = framesCount + 1;
     
     currentFrame = step(videoFileReader);
-    currentFrame = currentFrame(:, 1:520);
+    %currentFrame = currentFrame(:, 1:520);
     %currentFrameGray = rgb2gray(currentFrame);
     
     tic;
@@ -80,11 +86,12 @@ while ~isDone(videoFileReader)
     
     currentFrame = insertShape(currentFrame, 'Polygon', [p1(1), p1(2), p2(1), p2(2), p3(1), p3(2), p4(1), p4(2)], 'Color', 'red');
     currentFrame = insertText(currentFrame, [10, 10], [num2str(1/currentTime), ' fps']); 
-    currentFrame = insertMarker(currentFrame, tracker.getTrackedFeatures, '+', 'Color', 'red');
+    currentFrame = insertText(currentFrame, [10, 30], [num2str(tracker.getSimilarity * 100), '%']); 
+    %currentFrame = insertMarker(currentFrame, tracker.getTrackedFeatures, '+', 'Color', 'red');
     %currentFrame = insertMarker(currentFrame, currentPosition, '+', 'Color', 'red');
     step(videoPlayer, currentFrame);
     
-    disp([tracker.getSimilarity, size(tracker.getTrackedFeatures,1)]);
+    %disp([tracker.getSimilarity, size(tracker.getTrackedFeatures,1)]);
     
 end
 

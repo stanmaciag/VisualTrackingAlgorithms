@@ -1,15 +1,17 @@
-classdef CAMShiftTracker < trackingModule.VisualTracker
+classdef MeanShiftTracker < trackingModule.VisualTracker
 
     properties (Constant)
         
         % Default values of tracker parameters
         defaultModelBins = [16, 8, 8];
-        defaultBandwidthCompRegion = 2;
+        defaultBandwidthWindow = 1;
         defaultMaxIterations = 10;
         defaultStopThreshold = 1;
-        defaultBackgroundScalingFactor = 0.1;
+        defaultAdaptSizeCoeff = 0.2;
+        defaultAdaptSpeedCoeff = 0.5;
+        defaultMinSizeRatio = 0.1;   
+        defaultBackgroundScalingFactor = 1;
         defaultBandwidthBackgroundModel = 2;
-        defaultMinSizeRatio = 0.1;
         defaultAutoUpdate = true;
         defaultBackgroundCancel = false;
         
@@ -18,12 +20,14 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
     properties (Access = private)
         
         modelBins;
-        bandwidthCompRegion;
+        bandwidthWindow;
         maxIterations;
         stopThreshold;
+        adaptSizeCoeff;
+        adaptSpeedCoeff;
+        minSizeRatio;
         backgroundScalingFactor;
         bandwidthBackgroundModel;
-        minSizeRatio;
         autoUpdate;
         backgroundCancel;
         
@@ -32,6 +36,7 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
 
         % Tracked object histogram model
         targetModel;
+        candidateModel;
         % Bounding rectangle of tracked object
         initialDimensions;
         initialModel;
@@ -74,34 +79,42 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             addParameter(parameterParser, 'ModelBins', obj.modelBins, @(x) assert(isnumeric(x) && size(x,1) == 1 && ...
                 size(x,2) == 3 && sum(isfinite(x)) == 3 && sum(x == floor(x)) == 3 && sum(x > 0) == 3, ...
                 'Model bins quantity must be 1x3 vector containing positive integers'));
-            addParameter(parameterParser, 'BandwidthCompRegion', obj.bandwidthCompRegion, @(x) assert(isPositiveNumeric(x), ...
+            addParameter(parameterParser, 'BandwidthWindow', obj.bandwidthWindow, @(x) assert(isPositiveNumeric(x), ...
                 'Computation region bandwidth value must be positive numeric'));
             addParameter(parameterParser, 'MaxIterations', obj.maxIterations, @(x) assert(isPositiveInteger(x), ...
                 'Maximum iterations number must be positive integer'));
             addParameter(parameterParser, 'StopThreshold', obj.stopThreshold, @(x) assert(isPositiveNumeric(x), ...
                 'Stop threshold value must be positive numeric'));
+            addParameter(parameterParser, 'AdaptSizeCoeff', obj.adaptSizeCoeff, @(x) assert(isPositiveNumeric(x), ...
+                'Window adaptation size coefficient must be positive numeric'));
+            addParameter(parameterParser, 'AdaptSpeedCoeff', obj.adaptSpeedCoeff, @(x) assert(isPositiveNumeric(x), ...
+                'Window adaptation speed coefficient must be positive numeric'));
+            addParameter(parameterParser, 'MinSizeRatio', obj.minSizeRatio, @(x) assert(isPositiveNumeric(x), ...
+                'Minimal size ratio must be positive numeric'));
             addParameter(parameterParser, 'BackgroundScalingFactor', obj.backgroundScalingFactor, @(x) assert(isPositiveNumeric(x), ...
                 'Background scaling factor must be positive numeric'));
             addParameter(parameterParser, 'BandwidthBackgroundModel', obj.bandwidthBackgroundModel, @(x) assert(isPositiveNumeric(x), ...
                 'Background model bandwidth value must be positive numeric'));
-            addParameter(parameterParser, 'MinSizeRatio', obj.minSizeRatio, @(x) assert(isPositiveNumeric(x), ...
-                'Minimal size ratio must be positive numeric'));
             addParameter(parameterParser, 'AutoUpdate', obj.autoUpdate, @(x) assert(islogical(x), ...
                 'Model auto-update flag must be logical value'));
             addParameter(parameterParser, 'BackgroundCancel', obj.backgroundCancel, @(x) assert(islogical(x), ...
                 'Background subtraction in target model flag must be logical value'));
+            
+            
             
             % Parse given parameters
             parse(parameterParser, varargin{:});
 
             % Update parameters values 
             obj.modelBins = parameterParser.Results.ModelBins;
-            obj.bandwidthCompRegion = parameterParser.Results.BandwidthCompRegion;
+            obj.bandwidthWindow = parameterParser.Results.BandwidthWindow;
             obj.maxIterations = parameterParser.Results.MaxIterations;
             obj.stopThreshold = parameterParser.Results.StopThreshold;
+            obj.adaptSizeCoeff = parameterParser.Results.AdaptSizeCoeff;
+            obj.adaptSpeedCoeff = parameterParser.Results.AdaptSpeedCoeff;
+            obj.minSizeRatio = parameterParser.Results.MinSizeRatio;
             obj.backgroundScalingFactor = parameterParser.Results.BackgroundScalingFactor;
             obj.bandwidthBackgroundModel = parameterParser.Results.BandwidthBackgroundModel;
-            obj.minSizeRatio = parameterParser.Results.MinSizeRatio;
             obj.autoUpdate = parameterParser.Results.AutoUpdate;
             obj.backgroundCancel = parameterParser.Results.BackgroundCancel;
             
@@ -109,18 +122,20 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
        
         % Construct object with default parameters (alternatively modifed
         % by passed parameters)
-        function obj = CAMShiftTracker(varargin)
+        function obj = MeanShiftTracker(varargin)
            
              % Initialize object state
-            obj = obj@trackingModule.WindowGuidableVisualTracker;
+            obj = obj@trackingModule.VisualTracker;
             
             obj.modelBins = obj.defaultModelBins;
-            obj.bandwidthCompRegion = obj.defaultBandwidthCompRegion;
+            obj.bandwidthWindow = obj.defaultBandwidthWindow;
             obj.maxIterations = obj.defaultMaxIterations;
             obj.stopThreshold = obj.defaultStopThreshold;
+            obj.adaptSizeCoeff = obj.defaultAdaptSizeCoeff;
+            obj.adaptSpeedCoeff = obj.defaultAdaptSpeedCoeff;
+            obj.minSizeRatio = obj.defaultMinSizeRatio;
             obj.backgroundScalingFactor = obj.defaultBackgroundScalingFactor;
             obj.bandwidthBackgroundModel = obj.defaultBandwidthBackgroundModel;
-            obj.minSizeRatio = obj.defaultMinSizeRatio;
             obj.autoUpdate = obj.defaultAutoUpdate;
             obj.backgroundCancel = obj.defaultBackgroundCancel;
             
@@ -180,19 +195,36 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             
             %previousMaxDimension = max(obj.targetModel.horizontalRadious, obj.targetModel.verticalRadious);
             
-            [obj.position, obj.targetModel, obj.orientation, currentDimensions] = ...
-                CAMShift(obj.currentFrame, obj.targetModel, obj.position, obj.bandwidthCompRegion, ...
+            windowDelta = obj.adaptSizeCoeff * obj.bandwidthWindow;
+            newWindowBandwidth = [obj.bandwidthWindow, obj.bandwidthWindow + windowDelta, obj.bandwidthWindow - windowDelta];
+
+            newPosition = zeros(3,2);
+            newSimilarity = zeros(3,1);
+
+            [newPosition(1,:), newSimilarity(1), candidateModel1] = meanShift(obj.currentFrame, obj.position, ...
+                obj.targetModel, newWindowBandwidth(1), @epanechnikovProfile, @dEpanechnikovProfile, ...
                 obj.maxIterations, obj.stopThreshold);
+            [newPosition(2,:), newSimilarity(2), candidateModel2] = meanShift(obj.currentFrame, obj.position, ...
+                obj.targetModel, newWindowBandwidth(2), @epanechnikovProfile, @dEpanechnikovProfile, ...
+                obj.maxIterations, obj.stopThreshold);
+            [newPosition(3,:), newSimilarity(3), candidateModel3] = meanShift(obj.currentFrame, obj.position, ...
+                obj.targetModel, newWindowBandwidth(3), @epanechnikovProfile, @dEpanechnikovProfile, ...
+                obj.maxIterations, obj.stopThreshold);
+
+            [~, maxIdx] = max(newSimilarity);
+
+            obj.bandwidthWindow = obj.adaptSpeedCoeff * newWindowBandwidth(maxIdx) + (1 - obj.adaptSpeedCoeff) * obj.bandwidthWindow;
             
-            if  sum(isnan(obj.position)) > 0 || isnan(obj.orientation) || sum(isnan(currentDimensions))
-               
-                obj.status = false;
-                obj.similarity = 0;
-                return;
-                
-            end
+            obj.position = newPosition(maxIdx, :);
+           
+            newCandidateModel = [candidateModel1, candidateModel2, candidateModel3];
             
-            obj.dimensions = 2 * currentDimensions + 1;
+            obj.candidateModel = newCandidateModel(maxIdx);
+            
+            %obj.candidateModel = candidateModel1;
+            
+            obj.dimensions = [(2 * obj.candidateModel.horizontalRadious + 1) * obj.bandwidthWindow, ...
+                (2 * obj.candidateModel.verticalRadious + 1) * obj.bandwidthWindow];
             
             currentSizeRatio = obj.dimensions ./ obj.initialDimensions;
             
@@ -204,18 +236,17 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
                 
             end
             
-            obj.similarity = sum(sqrt(obj.targetModel.histogram .* obj.initialModel.histogram));
+            obj.similarity = sum(sqrt(obj.candidateModel.histogram .* obj.initialModel.histogram));
             
             if (obj.autoUpdate)
             
-                obj.update;
+               % obj.update;
             
             end
                 
         end
         
         % Update object's model
-        % Fast and Robust CAMShift Tracking - David Exner, Erich Bruns, Daniel Kurz, and Anselm Grundhofer
         function obj = update(obj)
             
             minX = max(1, floor(obj.position(1) - obj.targetModel.horizontalRadious));

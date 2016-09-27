@@ -1,6 +1,5 @@
 function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentFrame, previousPosition, ...
-    targetModel, windowBandwidth, windowProfileFcnHandle, windowDProfileFcnHandle, maxIterations, stopThreshold, idxMapFcnHandle, ...
-    histogramFcnHandle, pixelWeightsFcnHandle)
+    targetModel, windowBandwidth, windowProfileFcnHandle, windowDProfileFcnHandle, maxIterations, stopThreshold)
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Kernel-based object tracking
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Real-time tracking of non-rigid objects using mean shift
 % TODO Sprawdzić izotropowość
@@ -33,11 +32,11 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
         %roiMaxY = currentPosition(1) + round(targetModel.verticalRadious * windowBandwidth);
         %roiMinX = currentPosition(2) - round(targetModel.horizontalRadious * windowBandwidth);
         %roiMaxX = currentPosition(2) + round(targetModel.horizontalRadious * windowBandwidth);
-        roiMinY = currentPosition(1) - round(maxRadious * windowBandwidth);
-        roiMaxY = currentPosition(1) + round(maxRadious * windowBandwidth);
-        roiMinX = currentPosition(2) - round(maxRadious * windowBandwidth);
-        roiMaxX = currentPosition(2) + round(maxRadious * windowBandwidth);
-        
+        roiMinX = currentPosition(1) - round(maxRadious * windowBandwidth);
+        roiMaxX = currentPosition(1) + round(maxRadious * windowBandwidth);
+        roiMinY = currentPosition(2) - round(maxRadious * windowBandwidth);
+        roiMaxY = currentPosition(2) + round(maxRadious * windowBandwidth);
+
         % Adjust ROI size to fit kernel
         roiMaxY = roiMaxY - (roiMaxY - roiMinY + 1 - size(kernel,1));
         roiMaxX = roiMaxX - (roiMaxX - roiMinX + 1 - size(kernel,2));
@@ -45,10 +44,10 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
         % Compute sizes of necessary zeros-padding areas - asserts proper
         % operation when selected search window outreaches calculation
         % region
-        roiMinYPad = max(1 - roiMinY, 0);
-        roiMaxYPad = max(roiMaxY - size(currentFrame,1), 0);
         roiMinXPad = max(1 - roiMinX, 0);
         roiMaxXPad = max(roiMaxX - size(currentFrame,2), 0);
+        roiMinYPad = max(1 - roiMinY, 0);
+        roiMaxYPad = max(roiMaxY - size(currentFrame,1), 0);
         
          % Get target ROI from current frame (resistant to
         % outreaching image boundaries)
@@ -57,11 +56,11 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
             double(currentFrame(roiMinY + roiMinYPad : roiMaxY - roiMaxYPad, roiMinX + roiMinXPad : roiMaxX - roiMaxXPad,:));
         
         % Compute bin index map and weighted normalized histogram of the target ROI image
-        candidateIdxMap = idxMapFcnHandle(roi, targetModel.histogramBins,  range(1), range(2));
-        candidateHistogram = histogramFcnHandle(roi, kernel, candidateIdxMap, targetModel.histogramBins);
+        candidateIdxMap = binIdxMap_mex(roi, targetModel.histogramBins,  range(1), range(2));
+        candidateHistogram = normalizedWeightedHistogram_mex(roi, kernel, candidateIdxMap, targetModel.histogramBins);
         
         % Compute pixel weights
-        weightsMap = pixelWeightsFcnHandle(targetModel.histogram, candidateHistogram, kernel, candidateIdxMap);
+        weightsMap = pixelWeights_mex(targetModel.histogram, candidateHistogram, kernel, candidateIdxMap);
         
         % Calculate sum of weights
         weightsMapSum = sum(sum(weightsMap.*-kernelDerivative));
@@ -70,8 +69,8 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
         [roiXgrid, roiYgrid] = meshgrid(roiMinX:roiMaxX, roiMinY:roiMaxY);
         
         % Calculate new position
-        newPosition = round([sum(sum(roiYgrid.*weightsMap.*-kernelDerivative))/weightsMapSum, ...
-            sum(sum(roiXgrid.*weightsMap.*-kernelDerivative))/weightsMapSum]);
+        newPosition = round([sum(sum(roiXgrid.*weightsMap.*-kernelDerivative))/weightsMapSum, ...
+            sum(sum(roiYgrid.*weightsMap.*-kernelDerivative))/weightsMapSum]);
         
         % Check convergence condition - stop if position shift is smaller
         % than given threshold
@@ -85,8 +84,8 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
     end
     
     % Update candidate model
-    candidateModel.verticalRadious = targetModel.verticalRadious;
     candidateModel.horizontalRadious = targetModel.horizontalRadious;
+    candidateModel.verticalRadious = targetModel.verticalRadious;
     candidateModel.histogramBins = targetModel.histogramBins; 
     candidateModel.histogram = candidateHistogram;
     candidateModel.binIdxMap = candidateIdxMap;

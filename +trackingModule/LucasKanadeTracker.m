@@ -1,4 +1,4 @@
-classdef LucasKanadeTracker < trackingModule.Tracker
+classdef LucasKanadeTracker < trackingModule.VisualTracker
     
     properties (Constant)
         
@@ -70,7 +70,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
         featuresEigenvals;
         % Bounding polygon of tracked object
         boundingPolygon;
-        
+
     end
     
     methods (Access = private)
@@ -170,7 +170,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
         function obj = LucasKanadeTracker(varargin)
            
             % Initialize object state
-            obj = obj@trackingModule.Tracker;
+            obj = obj@trackingModule.VisualTracker;
             obj.boundingPolygon = zeros(4, 2);
             
             % Initialize tracking parameters
@@ -289,10 +289,11 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             
             % Estimate optical flow of tracked features
             [flow, trackingSuccessful] = pyramidalLucasKanade(obj.previousFrame, obj.currentFrame, ...
-                obj.targetFeatures, obj.trackWindowRadiousY, obj.trackWindowRadiousY, ...
+                obj.targetFeatures, obj.trackWindowRadiousY, obj.trackWindowRadiousX, ...
                 obj.maxIterations, obj.stopThreshold, obj.pyramidDepth, obj.minHessianDet, ...
                 @inverseCompostionalLK, @gaussianKernel);
 
+            
             % Retain only successfully tracked features (not degenerated
             % and not out of image bounds)
             obj.targetFeatures = obj.targetFeatures(trackingSuccessful, :);
@@ -342,6 +343,22 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             % Transform bounding polygon
             obj.boundingPolygon = applyHomography(obj.boundingPolygon, affineMatrix);
             
+            % Retain features that lie inside bounding polygon (make
+            % sure that they belong to tracked object)
+            inRoi = inpolygon(obj.targetFeatures(:,1), obj.targetFeatures(:,2), obj.boundingPolygon(:,1), obj.boundingPolygon(:,2));
+            obj.targetFeatures = obj.targetFeatures(inRoi,:);
+            obj.featuresEigenvals = obj.featuresEigenvals(inRoi,:);
+            
+            % Fail if quantity of current features that inside object
+            % bounding polygon is less that minimal
+            if nnz(inlinersIdx) < obj.minFeatures
+                
+                obj.status = false;
+                obj.similarity = 0;
+                return;
+                
+            end
+            
             % Transform current position
             obj.position = applyHomography(obj.position, affineMatrix);
             
@@ -361,6 +378,14 @@ classdef LucasKanadeTracker < trackingModule.Tracker
             obj.dimensions(1) = obj.dimensions(1) * scale;
             obj.dimensions(2) = obj.dimensions(2) * scale;
             
+            if  sum(isnan(obj.position)) > 0 || isnan(obj.orientation) || sum(isnan(obj.dimensions))
+               
+                obj.status = false;
+                obj.similarity = 0;
+                return;
+                
+            end
+            
             % Update object model if auto-updating is enabled and current to 
             % destined features quantity ratio is less or equal to threshold
             if obj.autoUpdate && size(obj.targetFeatures, 1) / obj.destFeatures <= obj.updateThreshold
@@ -368,7 +393,6 @@ classdef LucasKanadeTracker < trackingModule.Tracker
                 obj.update;
                 
             end
-
             
         end
 
@@ -424,7 +448,7 @@ classdef LucasKanadeTracker < trackingModule.Tracker
                 newFeatures(:,1) = newFeatures(:,1) + roiRect(1) - 1;
                 newFeatures(:,2) = newFeatures(:,2) + roiRect(2) - 1;
 
-                % Select features that lies inside bounding polygon (make
+                % Select features that lie inside bounding polygon (make
                 % sure that they belong to tracked object)
                 inRoi = inpolygon(newFeatures(:,1), newFeatures(:,2), obj.boundingPolygon(:,1), obj.boundingPolygon(:,2));
                 newFeatures = newFeatures(inRoi,:);
