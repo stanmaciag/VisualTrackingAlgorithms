@@ -33,7 +33,7 @@ Matlab console, using `system('make')`.
   - [dNormalProfile](../master/MeanShiftEngine/dNormalProfile.m) - compute a derivative of the profile function for Gaussian kernel for the given coordinates
   - [epanechnikovProfile](../master/MeanShiftEngine/epanechnikovProfile.m) - compute a profile function for Epanechnikov kernel for the given coordinates
   - [histogramModel](../master/MeanShiftEngine/histogramModel.m) - compute a color-space model (weighted histogram) for the given region of interest
-  - [MeanShift](../master/MeanShiftEngine/MeanShift.m) - track the target region of interest between frames using the MeanShift algorithm
+  - [MeanShift](../master/MeanShiftEngine/meanShift.m) - track the target region of interest between frames using the MeanShift algorithm
   - [normalProfile](../master/MeanShiftEngine/normalProfile.m) - compute a profile function for Gaussian kernel for the given coordinates
   - [ratioHistogramModel](../master/MeanShiftEngine/ratioHistogramModel.m) - compute a color-space model (weighted histogram) for the given region of interest with background cancelling 
   - [binIdxMap](../master/MeanShiftEngine/matlab/binIdxMap.m) - compute a map of bin indicies of the histogram for the given image
