@@ -11,32 +11,32 @@ Matlab console, using `system('make')`.
 
 - [Lucas-Kanade tracking engine](../master/+trackingModule/LucasKanadeTracker.m)
   - [applyHomography](../master/LucasKanadeEngine/applyHomography.m) - apply homography transformation to the set of points with given homography matrix
-  - [computeAffine](../master/LucasKanadeEngine/computeAffine) estimate the affine transformation between two sets of points using The Gold Standard Algorithm 
-  - [computeHomography](../master/LucasKanadeEngine/computeHomography)estimate the homography transformation between two sets of points using The Normalized Direct Linear Transformation algorithm
-  - find good features to track on the given image using Tomasi-Kanade feature extractor (LucasKanadeEngine/findGoodFeatures)
-  - fit homography transformation between two sets of points using RANSAC algorithm (LucasKanadeEngine/fitHomography)
-  - estimate optical flow for given set of points and two consequent frames of the video sequence using classic (forward-additive) version of the Lucas-Kanade algorithm (LucasKanadeEngine/forwardAdditiveLK)
-  - compute Gaussian kernel for given coordinates (LucasKanadeEngine/gaussianKernel)
-  - estimate optical flow for given set of points and two consequent frames of the video sequence using high performance (inverse-compostional) version of the Lucas-Kanade algorithm (LucasKanadeEngine/inverseCompositionalLK)
-  - track points between given frames using Lucas-Kanade algorithm (LucasKanadeEngine/lucasKanadeAlgorithm)
-  - track points between given frames in the scale-space using pyramidal version of the Lucas-Kanade algorithm (LucasKanadeEngine.pyramidalLucasKanade)
-  - compute uniform kernel for the given coordinates (LucasKanadeEngine/uniformKernel)
-  - interpolate values of subpixels for the given image using bilinear interpolation (LucasKanadeEngine/matlab/bilinearInterpolate and LucasKanadeEngine/mex/bilinearInterpolate)
-  - compute image gradient for the given set of pixels (LucasKanadeEngine/matlab/imageGradient and LucasKanadeEngine/mex/imageGradient)
-  - compute scale-space representation (image pyramid) of the image (LucasKanadeEngine/matlab/imagePyramid and LucasKanadeEngine/mex/imagePyramid)
-  - compute image gradient for the given set of subpixels (LucasKanadeEngine/matlab/interpolatedGradient and LucasKanadeEngine/mex/interpolatedGradient)
-  - find proximity map for the given coordinates of points (LucasKanadeEngine/matlab/proximityMap and LucasKanadeEngine/mex/proximityMap)
-- MeanShift/CAMShift tracking engine (trackingModule.MeanShiftTracker and trackingModule.CAMShiftTracker)
-  - compute profile function of scaling desitiy kernel (MeanShiftEngine/backgroundScalingProfile)
-  - track target region of interest between frames using CAMShift algorithm (MeanShiftEngine/CAMShift)
-  - compute derivative of the profile function for Epanechnikov kernel for the given coordinates (MeanShiftEngine/dEpanechnikovProfile)
-  - compute derivative of the profile function for Gaussian kernel for the given coordinates (MeanShiftEngine/dNormalProfile)
-  - compute the profile function for Epanechnikov kernel for the given coordinates (MeanShiftEngine/epanechnikovProfile)
-  - compute color-space model (weighted histogram) for the given region of interest (MeanShiftEngine/histogramModel)
-  - track target region of interest between frames using MeanShift algorithm (MeanShiftEngine/MeanShift)
-  - compute the profile function for Gaussian kernel for the given coordinates (MeanShiftEngine/normalProfile)
-  - compute color-space model (weighted histogram) for the given region of interest with background cancelling (MeanShiftEngine/ratioHistogramModel)
-  - compute map of bin indicies of the histogram for the given image (MeanShiftEngine/matlab/binIdxMap and MeanShiftEngine/mex/binIdxMap)
-  - compute normalized weigthed histogram for the given image (MeanShiftEngine/matlab/normalizedWeightedHistogram and MeanShiftEngine/mex/normalizedWeightedHistogram)
-  - compute bin weights for the MeanShift algorithm (MeanShiftEngine/matlab/pixelWeights and MeanShiftEngine/mex/pixelWeights)
-  - compute weigthed histogram for the given image (MeanShiftEngine/matlab/weightedHistogram and MeanShiftEngine/mex/weightedHistogram)
+  - [computeAffine](../master/LucasKanadeEngine/computeAffine.m) - estimate a affine transformation between two sets of points using The Gold Standard Algorithm 
+  - [computeHomography](../master/LucasKanadeEngine/computeHomography.m) - estimate a homography transformation between two sets of points using The Normalized Direct Linear Transformation algorithm
+  - [findGoodFeatures](../master/LucasKanadeEngine/findGoodFeatures.m) - find good features to track on the given image using Tomasi-Kanade feature extractor
+  - [fitHomography](../master/LucasKanadeEngine/fitHomography.m) - fit a homography transformation between two sets of points using RANSAC algorithm
+  - [forwardAdditiveLK](../master/LucasKanadeEngine/forwardAdditiveLK.m) - estimate an optical flow for given set of points and two consequent frames of the video sequence using classic (forward-additive) version of the Lucas-Kanade algorithm
+  - [gaussianKernel](../master/LucasKanadeEngine/gaussianKernel.m) - compute Gaussian kernel for the given coordinates
+  - [inverseCompositionalLK](../master/LucasKanadeEngine/inverseCompositionalLK.m) - estimate an optical flow for the given set of points and two consequent frames of the video sequence using high performance (inverse-compostional) version of the Lucas-Kanade algorithm
+  - [lucasKanadeAlgorithm](../master/LucasKanadeEngine/lucasKanadeAlgorithm.m) - track points between given frames using the Lucas-Kanade algorithm
+  - [pyramidalLucasKanade](../master/LucasKanadeEngine.pyramidalLucasKanade.m) - track points between given frames in the scale-space using the pyramidal version of the Lucas-Kanade algorithm
+  - [uniformKernel](../master/LucasKanadeEngine/uniformKernel.m) - compute an uniform kernel for the given coordinates
+  - [bilinearInterpolate](../master/LucasKanadeEngine/matlab/bilinearInterpolate.m) - interpolate the values of subpixels for the given image using bilinear interpolation 
+  - [imageGradient](../master/LucasKanadeEngine/matlab/imageGradient.m) - compute an image gradient for the given set of pixels
+  - [imagePyramid](../master/LucasKanadeEngine/matlab/imagePyramid.m) - compute a scale-space representation (image pyramid) of the image
+  - [interpolatedGradient](../master/LucasKanadeEngine/matlab/interpolatedGradient.m) - compute an image gradient for the given set of subpixels
+  - [proximityMap](../master/LucasKanadeEngine/matlab/proximityMap.m) - find a proximity map for the given coordinates of points
+- [MeanShift](trackingModule.MeanShiftTracker.m) and [CAMShift](trackingModule.CAMShiftTracker.m) tracking engine
+  - [backgroundScalingProfile](../master/MeanShiftEngine/backgroundScalingProfile.m) - compute a profile function of scaling desitiy kernel
+  - [CAMShift](../master/MeanShiftEngine/CAMShift.m) - track the target region of interest between frames using the CAMShift algorithm
+  - [dEpanechnikovProfile](../master/MeanShiftEngine/dEpanechnikovProfile.m) - compute a derivative of the profile function for Epanechnikov kernel for the given coordinates
+  - [dNormalProfile](../master/MeanShiftEngine/dNormalProfile.m) - compute a derivative of the profile function for Gaussian kernel for the given coordinates
+  - [epanechnikovProfile](../master/MeanShiftEngine/epanechnikovProfile.m) - compute a profile function for Epanechnikov kernel for the given coordinates
+  - [histogramModel](../master/MeanShiftEngine/histogramModel.m) - compute a color-space model (weighted histogram) for the given region of interest
+  - [MeanShift](../master/MeanShiftEngine/MeanShift.m) - track the target region of interest between frames using the MeanShift algorithm
+  - [normalProfile](../master/MeanShiftEngine/normalProfile.m) - compute a profile function for Gaussian kernel for the given coordinates
+  - [ratioHistogramModel](../master/MeanShiftEngine/ratioHistogramModel.m) - compute a color-space model (weighted histogram) for the given region of interest with background cancelling 
+  - [binIdxMap](../master/MeanShiftEngine/matlab/binIdxMap.m) - compute a map of bin indicies of the histogram for the given image
+  - [normalizedWeightedHistogram](../master/MeanShiftEngine/matlab/normalizedWeightedHistogram.m) - compute a normalized weigthed histogram for the given image
+  - [pixelWeights](../master/MeanShiftEngine/matlab/pixelWeights.m) - compute a bin weights for the MeanShift algorithm
+  - [weightedHistogram](../master/MeanShiftEngine/matlab/weightedHistogram.m) - compute weigthed histogram for the given image
