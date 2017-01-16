@@ -27,7 +27,7 @@ Matlab console, using `system('make')`.
   - [interpolatedGradient](../master/LucasKanadeEngine/matlab/interpolatedGradient.m) - compute an image gradient for the given set of subpixels
   - [proximityMap](../master/LucasKanadeEngine/matlab/proximityMap.m) - find a proximity map for the given coordinates of points
 - [MeanShift](../master/+trackingModule/MeanShiftTracker.m) and [CAMShift](../master/+trackingModule/CAMShiftTracker.m) tracking engine
-  - [backgroundScalingProfile](../master/MeanShiftEngine/backgroundScalingProfile.m) - compute a profile function of scaling desitiy kernel
+  - [backgroundScalingProfile](../master/MeanShiftEngine/backgorundScalingProfile.m) - compute a profile function of scaling desitiy kernel
   - [CAMShift](../master/MeanShiftEngine/CAMShift.m) - track the target region of interest between frames using the CAMShift algorithm
   - [dEpanechnikovProfile](../master/MeanShiftEngine/dEpanechnikovProfile.m) - compute a derivative of the profile function for Epanechnikov kernel for the given coordinates
   - [dNormalProfile](../master/MeanShiftEngine/dNormalProfile.m) - compute a derivative of the profile function for Gaussian kernel for the given coordinates
