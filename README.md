@@ -17,9 +17,9 @@ Matlab console, using `system('make')`.
   - [fitHomography](../master/LucasKanadeEngine/fitHomography.m) - fit a homography transformation between two sets of points using RANSAC algorithm
   - [forwardAdditiveLK](../master/LucasKanadeEngine/forwardAdditiveLK.m) - estimate an optical flow for given set of points and two consequent frames of the video sequence using classic (forward-additive) version of the Lucas-Kanade algorithm
   - [gaussianKernel](../master/LucasKanadeEngine/gaussianKernel.m) - compute Gaussian kernel for the given coordinates
-  - [inverseCompositionalLK](../master/LucasKanadeEngine/inverseCompositionalLK.m) - estimate an optical flow for the given set of points and two consequent frames of the video sequence using high performance (inverse-compostional) version of the Lucas-Kanade algorithm
+  - [inverseCompositionalLK](../master/LucasKanadeEngine/inverseCompostionalLK.m) - estimate an optical flow for the given set of points and two consequent frames of the video sequence using high performance (inverse-compostional) version of the Lucas-Kanade algorithm
   - [lucasKanadeAlgorithm](../master/LucasKanadeEngine/lucasKanadeAlgorithm.m) - track points between given frames using the Lucas-Kanade algorithm
-  - [pyramidalLucasKanade](../master/LucasKanadeEngine.pyramidalLucasKanade.m) - track points between given frames in the scale-space using the pyramidal version of the Lucas-Kanade algorithm
+  - [pyramidalLucasKanade](../master/LucasKanadeEngine/pyramidalLucasKanade.m) - track points between given frames in the scale-space using the pyramidal version of the Lucas-Kanade algorithm
   - [uniformKernel](../master/LucasKanadeEngine/uniformKernel.m) - compute an uniform kernel for the given coordinates
   - [bilinearInterpolate](../master/LucasKanadeEngine/matlab/bilinearInterpolate.m) - interpolate the values of subpixels for the given image using bilinear interpolation 
   - [imageGradient](../master/LucasKanadeEngine/matlab/imageGradient.m) - compute an image gradient for the given set of pixels
