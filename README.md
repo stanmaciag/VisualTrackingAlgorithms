@@ -9,7 +9,7 @@ Matlab console, using `system('make')`.
 
 ## List of Matlab functions and modules
 
-- Lucas-Kanade tracking engine (trackingModule/LucasKanadeTracker.m)
+- [Lucas-Kanade tracking engine](../master/+trackingModule/LucasKanadeTracker.m)
   - apply homography transformation to set of points with given homography matrix [applyHomography](../master/LucasKanadeEngine/applyHomography.m)
   - estimate affine transformation between two sets of points using The Gold Standard Algorithm (LucasKanadeEngine/computeAffine)
   - estimate homography transformation between two sets of points using The Normalized Direct Linear Transformation algorithm (LucasKanadeEngine/computeHomography)
