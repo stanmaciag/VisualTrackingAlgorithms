@@ -40,3 +40,17 @@ Matlab console, using `system('make')`.
   - [normalizedWeightedHistogram](../master/MeanShiftEngine/matlab/normalizedWeightedHistogram.m) - compute a normalized weigthed histogram for the given image
   - [pixelWeights](../master/MeanShiftEngine/matlab/pixelWeights.m) - compute a bin weights for the MeanShift algorithm
   - [weightedHistogram](../master/MeanShiftEngine/matlab/weightedHistogram.m) - compute weigthed histogram for the given image
+
+## References
+
+1. Allen, J. G.; Xu, R. Y. D. & Jin, J. S. Object tracking using CamShift algorithm and multiple quantized feature spaces Proceedings of the Pan-Sydney area workshop on visual information processing, 2006, 36, 3 - 7
+2. Baker, S. & Matthews, I. Lucas-Kanade 20 Years On: A Unifying Framework International Journal of Computer Vision, 2004, 56, 221-255
+3. Bouguet, J.-Y. Pyramidal implementation of the Lucas Kanade feature tracker - Description of the algorithm Intel Corporation - Microprocessor Research Labs, 2000
+4. Bradski, G. R. Real time face and object tracking as a component of a perceptual user interface Fourth IEEE Workshop Applications of Computer Vision (WACV), IEEE, 1998, 214 - 219
+5. Comaniciu, D.; Ramesh, V. & Meer, P. Kernel-based object tracking IEEE Transactions on Pattern Analysis and Machine Intelligence, 2003, 25, 564 - 577
+6. Comaniciu, D.; Ramesh, V. & Meer, P. Real-time tracking of non-rigid objects using mean shift Proceedings. IEEE Conference on Computer Vision and Pattern Recognition, 2000, 2, 142 - 149
+7. Hartley, R. & Zisserman, A. Multiple View Geometry in Computer Vision Cambridge University Press, 2004
+8. Lucas, B. D. & Kanade, T. An iterative image registration technique with an application to stereo vision 7th International Joint Conference on Artificial intelligence (IJCAI), Morgan Kaufmann Publishers, 1981, 2, 674 - 679
+9. Shi, J. & Tomasi, C. Good features to track Computer Society Conference on Computer Vision and Pattern Recognition (CVPR), IEEE, 1994, 593 - 600
+10. Tomasi, C. & Kanade, T. Detection and Tracking of Point Features School of Computer Science Carnegie Mellon University, 1991 
+
