@@ -1,4 +1,4 @@
-#include "histogramEngine.h"
+#include "lib/histogramEngine.h"
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
