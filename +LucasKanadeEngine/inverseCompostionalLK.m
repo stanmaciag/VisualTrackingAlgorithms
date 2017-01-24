@@ -1,6 +1,7 @@
 function [opticalFlow, trackingSuccessful] = inverseCompostionalLK(previousFrame, currentFrame, ...
     trackedPoints, windowRadiousY, windowRadiousX, maxIterations, ...
-    stopThreshold, weightingKernel, minHessianDet, initialOpticalFlow)
+    stopThreshold, weightingKernel, minHessianDet, initialOpticalFlow, ...
+    interpolatedGradientFcnHandle, bilinearInterpolateFcnHandle)
     % References
     % ----------
     % 1. Baker, S. & Matthews, I. Lucas-Kanade 20 Years On: A Unifying 
@@ -48,15 +49,15 @@ function [opticalFlow, trackingSuccessful] = inverseCompostionalLK(previousFrame
     % Compute template's spatial gradients in every search window (has to
     % be interpolated, because function accetps non-integer coordinates of
     % tracked points)
-    %gradientYWindow = bilinearInterpolate_mex(gradientY, windowPixelsY, windowPixelsX);
-    %gradientXWindow = bilinearInterpolate_mex(gradientX, windowPixelsY, windowPixelsX);
-    %[gradientXWindow, gradientYWindow] = interpolatedGradient_mex(previousFrame, windowPixelsY, windowPixelsX);
+    %gradientYWindow = bilinearInterpolateFcnHandle(gradientY, windowPixelsY, windowPixelsX);
+    %gradientXWindow = bilinearInterpolateFcnHandle(gradientX, windowPixelsY, windowPixelsX);
+    %[gradientXWindow, gradientYWindow] = interpolatedGradientFcnHandle(previousFrame, windowPixelsY, windowPixelsX);
     [gradientXWindow(:,:,trackingSuccessful), gradientYWindow(:,:,trackingSuccessful)] = ....
-        interpolatedGradient_mex(previousFrame, windowPixelsY(:,:,trackingSuccessful), windowPixelsX(:,:,trackingSuccessful));
+        interpolatedGradientFcnHandle(previousFrame, windowPixelsY(:,:,trackingSuccessful), windowPixelsX(:,:,trackingSuccessful));
 
     % Get template image in every search window
-    %templateWindow = bilinearInterpolate_mex(previousFrame, windowPixelsY, windowPixelsX);
-    templateWindow(:,:,trackingSuccessful) = bilinearInterpolate_mex(previousFrame, windowPixelsY(:,:,trackingSuccessful), ...
+    %templateWindow = bilinearInterpolateFcnHandle(previousFrame, windowPixelsY, windowPixelsX);
+    templateWindow(:,:,trackingSuccessful) = bilinearInterpolateFcnHandle(previousFrame, windowPixelsY(:,:,trackingSuccessful), ...
         windowPixelsX(:,:,trackingSuccessful));
     
     %gradientMomentXX = zeros(1, 1 ,size(gradientXWindow, 3));
@@ -116,7 +117,7 @@ function [opticalFlow, trackingSuccessful] = inverseCompostionalLK(previousFrame
         currentFlowFieldX = permute(currentFlowFieldX, [2, 3, 1]);
 
         % Compute warped current search window
-        windowWarped = bilinearInterpolate_mex(currentFrame, ...
+        windowWarped = bilinearInterpolateFcnHandle(currentFrame, ...
                    windowPixelsY(:,:,toProcessIdx) + currentFlowFieldY, ...
                    windowPixelsX(:,:,toProcessIdx) + currentFlowFieldX);
                

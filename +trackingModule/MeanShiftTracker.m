@@ -14,6 +14,7 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
         defaultBandwidthBackgroundModel = 2;
         defaultAutoUpdate = true;
         defaultBackgroundCancel = false;
+        defaultUseMEX = true;
         
     end
     
@@ -30,6 +31,7 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
         bandwidthBackgroundModel;
         autoUpdate;
         backgroundCancel;
+        useMEX;
         
          % Current frame passed to tracker
         currentFrame;
@@ -40,6 +42,12 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
         % Bounding rectangle of tracked object
         initialDimensions;
         initialModel;
+        
+        %Function handles (for functions that are implemented both as
+        %Matlab native and MEX
+        binIdxMapFcnHandle;
+        normalizedWeightedHistogramFcnHandle;
+        pixelWeightsFcnHandle;
         
     end
     
@@ -58,6 +66,56 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
             end
             
             obj.currentFrame = newFrame;
+            
+        end
+        
+        function obj = setFcnHandles(obj)
+            
+           
+            if obj.useMEX
+            
+                % Check if compiled MEX functions are present, set function handles
+                % properly
+                if isempty(dir('+MeanShiftEngine/+mex/binIdxMap.mex*'))
+
+                    obj.binIdxMapFcnHandle = @MeanShiftEngine.matlab.binIdxMap;
+                    warning('MeanShiftTracker:fileNotFound', 'MEX function binIdxMap not found, using native version');
+
+                else
+
+                    obj.binIdxMapFcnHandle = @MeanShiftEngine.mex.binIdxMap;
+
+                end
+
+                if isempty(dir('+MeanShiftEngine/+mex/binIdxMap.mex*'))
+
+                    obj.normalizedWeightedHistogramFcnHandle = @MeanShiftEngine.matlab.normalizedWeightedHistogram;
+                    warning('MeanShiftTracker:fileNotFound', 'MEX function normalizedWeightedHistogram not found, using native version');
+
+                else
+
+                    obj.normalizedWeightedHistogramFcnHandle = @MeanShiftEngine.mex.normalizedWeightedHistogram;
+
+                end
+                
+                if isempty(dir('+MeanShiftEngine/+mex/pixelWeights.mex*'))
+
+                    obj.pixelWeightsFcnHandle = @MeanShiftEngine.matlab.pixelWeights;
+                    warning('MeanShiftTracker:fileNotFound', 'MEX function pixelWeights not found, using native version');
+
+                else
+
+                    obj.pixelWeightsFcnHandle = @MeanShiftEngine.mex.pixelWeights;
+
+                end
+            
+            else
+                
+                obj.binIdxMapFcnHandle = @MeanShiftEngine.matlab.binIdxMap;
+                obj.normalizedWeightedHistogramFcnHandle = @MeanShiftEngine.matlab.normalizedWeightedHistogram;  
+                obj.pixelWeightsFcnHandle = @MeanShiftEngine.matlab.pixelWeights;
+                
+            end
             
         end
         
@@ -99,8 +157,8 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
                 'Model auto-update flag must be logical value'));
             addParameter(parameterParser, 'BackgroundCancel', obj.backgroundCancel, @(x) assert(islogical(x), ...
                 'Background subtraction in target model flag must be logical value'));
-            
-            
+            addParameter(parameterParser, 'UseMEX', obj.useMEX, @(x) assert(islogical(x), ...
+                'MEX functions usage flag must be logical value'));
             
             % Parse given parameters
             parse(parameterParser, varargin{:});
@@ -117,6 +175,14 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
             obj.bandwidthBackgroundModel = parameterParser.Results.BandwidthBackgroundModel;
             obj.autoUpdate = parameterParser.Results.AutoUpdate;
             obj.backgroundCancel = parameterParser.Results.BackgroundCancel;
+            obj.useMEX = obj.defaultUseMEX;
+            
+            if obj.useMEX ~= parameterParser.Results.UseMEX
+               
+                obj.useMEX = parameterParser.Results.UseMEX;
+                obj.setFcnHandles;
+                
+            end
             
         end
        
@@ -138,8 +204,11 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
             obj.bandwidthBackgroundModel = obj.defaultBandwidthBackgroundModel;
             obj.autoUpdate = obj.defaultAutoUpdate;
             obj.backgroundCancel = obj.defaultBackgroundCancel;
+            obj.useMEX = obj.defaultUseMEX;
             
             setParameter(obj, varargin{:});
+            
+            obj.setFcnHandles;
 
         end
         
@@ -167,13 +236,15 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
             
             if (obj.backgroundCancel)
                 
-                obj.targetModel = ratioHistogramModel(obj.currentFrame, roiRect, @epanechnikovProfile, ...
-                    @backgorundScalingProfile, obj.modelBins, obj.bandwidthBackgroundModel, obj.backgroundScalingFactor);
+                obj.targetModel = MeanShiftEngine.ratioHistogramModel(obj.currentFrame, roiRect, @MeanShiftEngine.epanechnikovProfile, ...
+                    @MeanShiftEngine.backgorundScalingProfile, obj.modelBins, obj.bandwidthBackgroundModel, obj.backgroundScalingFactor, ...
+                    obj.binIdxMapFcnHandle, obj.normalizedWeightedHistogramFcnHandle);
                 
             else
                 
                 roi = obj.currentFrame(roiRect(2) : roiRect(2) + roiRect(4), roiRect(1) : roiRect(1) + roiRect(3), :);
-                obj.targetModel = histogramModel(roi, @epanechnikovProfile, obj.modelBins);
+                obj.targetModel = MeanShiftEngine.histogramModel(roi, @MeanShiftEngine.epanechnikovProfile, obj.modelBins, obj.binIdxMapFcnHandle, ...
+                    obj.normalizedWeightedHistogramFcnHandle);
                 
             end
  
@@ -201,15 +272,18 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
             newPosition = zeros(3,2);
             newSimilarity = zeros(3,1);
 
-            [newPosition(1,:), newSimilarity(1), candidateModel1] = meanShift(obj.currentFrame, obj.position, ...
-                obj.targetModel, newWindowBandwidth(1), @epanechnikovProfile, @dEpanechnikovProfile, ...
-                obj.maxIterations, obj.stopThreshold);
-            [newPosition(2,:), newSimilarity(2), candidateModel2] = meanShift(obj.currentFrame, obj.position, ...
-                obj.targetModel, newWindowBandwidth(2), @epanechnikovProfile, @dEpanechnikovProfile, ...
-                obj.maxIterations, obj.stopThreshold);
-            [newPosition(3,:), newSimilarity(3), candidateModel3] = meanShift(obj.currentFrame, obj.position, ...
-                obj.targetModel, newWindowBandwidth(3), @epanechnikovProfile, @dEpanechnikovProfile, ...
-                obj.maxIterations, obj.stopThreshold);
+            [newPosition(1,:), newSimilarity(1), candidateModel1] = MeanShiftEngine.meanShift(obj.currentFrame, obj.position, ...
+                obj.targetModel, newWindowBandwidth(1), @MeanShiftEngine.epanechnikovProfile, @MeanShiftEngine.dEpanechnikovProfile, ...
+                obj.maxIterations, obj.stopThreshold, obj.binIdxMapFcnHandle, obj.normalizedWeightedHistogramFcnHandle, ...
+                obj.pixelWeightsFcnHandle);
+            [newPosition(2,:), newSimilarity(2), candidateModel2] = MeanShiftEngine.meanShift(obj.currentFrame, obj.position, ...
+                obj.targetModel, newWindowBandwidth(2), @MeanShiftEngine.epanechnikovProfile, @MeanShiftEngine.dEpanechnikovProfile, ...
+                obj.maxIterations, obj.stopThreshold, obj.binIdxMapFcnHandle, obj.normalizedWeightedHistogramFcnHandle, ...
+                obj.pixelWeightsFcnHandle);
+            [newPosition(3,:), newSimilarity(3), candidateModel3] = MeanShiftEngine.meanShift(obj.currentFrame, obj.position, ...
+                obj.targetModel, newWindowBandwidth(3), @MeanShiftEngine.epanechnikovProfile, @MeanShiftEngine.dEpanechnikovProfile, ...
+                obj.maxIterations, obj.stopThreshold, obj.binIdxMapFcnHandle, obj.normalizedWeightedHistogramFcnHandle, ...
+                obj.pixelWeightsFcnHandle);
 
             [~, maxIdx] = max(newSimilarity);
 
@@ -258,7 +332,8 @@ classdef MeanShiftTracker < trackingModule.VisualTracker
             roiRect = [minX, minY, maxX - minX, maxY - minY];
 
             roi = obj.currentFrame(roiRect(2) : roiRect(2) + roiRect(4), roiRect(1) : roiRect(1) + roiRect(3), :);
-            newModel = histogramModel(roi, @epanechnikovProfile, obj.modelBins);
+            newModel = MeanShiftEngine.histogramModel(roi, @MeanShiftEngine.epanechnikovProfile, obj.modelBins, obj.binIdxMapFcnHandle, ...
+                    obj.normalizedWeightedHistogramFcnHandle);
 
             obj.targetModel.histogram = obj.targetModel.histogram + newModel.histogram;
             

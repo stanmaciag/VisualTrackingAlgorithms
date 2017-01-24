@@ -12,6 +12,7 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
         defaultMinSizeRatio = 0.1;
         defaultAutoUpdate = true;
         defaultBackgroundCancel = false;
+        defaultUseMEX = true;
         
     end
     
@@ -26,6 +27,7 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
         minSizeRatio;
         autoUpdate;
         backgroundCancel;
+        useMEX;
         
          % Current frame passed to tracker
         currentFrame;
@@ -35,6 +37,11 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
         % Bounding rectangle of tracked object
         initialDimensions;
         initialModel;
+        
+        %Function handles (for functions that are implemented both as
+        %Matlab native and MEX
+        binIdxMapFcnHandle;
+        normalizedWeightedHistogramFcnHandle;
         
     end
     
@@ -56,6 +63,45 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             
         end
         
+        
+        function obj = setFcnHandles(obj)
+            
+           
+            if obj.useMEX
+            
+                % Check if compiled MEX functions are present, set function handles
+                % properly
+                if isempty(dir('+MeanShiftEngine/+mex/binIdxMap.mex*'))
+
+                    obj.binIdxMapFcnHandle = @MeanShiftEngine.matlab.binIdxMap;
+                    warning('CAMShiftTracker:fileNotFound', 'MEX function binIdxMap not found, using native version');
+
+                else
+
+                    obj.binIdxMapFcnHandle = @MeanShiftEngine.mex.binIdxMap;
+
+                end
+
+                if isempty(dir('+MeanShiftEngine/+mex/binIdxMap.mex*'))
+
+                    obj.normalizedWeightedHistogramFcnHandle = @MeanShiftEngine.matlab.normalizedWeightedHistogram;
+                    warning('CAMShiftTracker:fileNotFound', 'MEX function normalizedWeightedHistogram not found, using native version');
+
+                else
+
+                    obj.normalizedWeightedHistogramFcnHandle = @MeanShiftEngine.mex.normalizedWeightedHistogram;
+
+                end
+            
+            else
+                
+                obj.binIdxMapFcnHandle = @MeanShiftEngine.matlab.binIdxMap;
+                obj.normalizedWeightedHistogramFcnHandle = @MeanShiftEngine.matlab.normalizedWeightedHistogram;  
+                
+            end
+            
+        end
+
     end
     
     methods
@@ -90,6 +136,8 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
                 'Model auto-update flag must be logical value'));
             addParameter(parameterParser, 'BackgroundCancel', obj.backgroundCancel, @(x) assert(islogical(x), ...
                 'Background subtraction in target model flag must be logical value'));
+            addParameter(parameterParser, 'UseMEX', obj.useMEX, @(x) assert(islogical(x), ...
+                'MEX functions usage flag must be logical value'));
             
             % Parse given parameters
             parse(parameterParser, varargin{:});
@@ -105,6 +153,13 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             obj.autoUpdate = parameterParser.Results.AutoUpdate;
             obj.backgroundCancel = parameterParser.Results.BackgroundCancel;
             
+            if obj.useMEX ~= parameterParser.Results.UseMEX
+               
+                obj.useMEX = parameterParser.Results.UseMEX;
+                obj.setFcnHandles;
+                
+            end
+
         end
        
         % Construct object with default parameters (alternatively modifed
@@ -112,8 +167,6 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
         function obj = CAMShiftTracker(varargin)
            
              % Initialize object state
-            obj = obj@trackingModule.WindowGuidableVisualTracker;
-            
             obj.modelBins = obj.defaultModelBins;
             obj.bandwidthCompRegion = obj.defaultBandwidthCompRegion;
             obj.maxIterations = obj.defaultMaxIterations;
@@ -123,9 +176,12 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             obj.minSizeRatio = obj.defaultMinSizeRatio;
             obj.autoUpdate = obj.defaultAutoUpdate;
             obj.backgroundCancel = obj.defaultBackgroundCancel;
+            obj.useMEX = obj.defaultUseMEX;
             
             setParameter(obj, varargin{:});
-
+            
+            obj.setFcnHandles;
+            
         end
         
         % Select area that contains tracked object and determine its model
@@ -152,13 +208,15 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             
             if (obj.backgroundCancel)
                 
-                obj.targetModel = ratioHistogramModel(obj.currentFrame, roiRect, @epanechnikovProfile, ...
-                    @backgorundScalingProfile, obj.modelBins, obj.bandwidthBackgroundModel, obj.backgroundScalingFactor);
+                obj.targetModel = MeanShiftEngine.ratioHistogramModel(obj.currentFrame, roiRect, @MeanShiftEngine.epanechnikovProfile, ...
+                    @MeanShiftEngine.backgorundScalingProfile, obj.modelBins, obj.bandwidthBackgroundModel, obj.backgroundScalingFactor, ...
+                    obj.binIdxMapFcnHandle, obj.normalizedWeightedHistogramFcnHandle);
                 
             else
                 
                 roi = obj.currentFrame(roiRect(2) : roiRect(2) + roiRect(4), roiRect(1) : roiRect(1) + roiRect(3), :);
-                obj.targetModel = histogramModel(roi, @epanechnikovProfile, obj.modelBins);
+                obj.targetModel = MeanShiftEngine.histogramModel(roi, @MeanShiftEngine.epanechnikovProfile, obj.modelBins, ...
+                    obj.binIdxMapFcnHandle, obj.normalizedWeightedHistogramFcnHandle);
                 
             end
  
@@ -181,8 +239,8 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             %previousMaxDimension = max(obj.targetModel.horizontalRadious, obj.targetModel.verticalRadious);
             
             [obj.position, obj.targetModel, obj.orientation, currentDimensions] = ...
-                CAMShift(obj.currentFrame, obj.targetModel, obj.position, obj.bandwidthCompRegion, ...
-                obj.maxIterations, obj.stopThreshold);
+                MeanShiftEngine.CAMShift(obj.currentFrame, obj.targetModel, obj.position, obj.bandwidthCompRegion, ...
+                obj.maxIterations, obj.stopThreshold, obj.binIdxMapFcnHandle);
             
             if  sum(isnan(obj.position)) > 0 || isnan(obj.orientation) || sum(isnan(currentDimensions))
                
@@ -227,7 +285,8 @@ classdef CAMShiftTracker < trackingModule.VisualTracker
             roiRect = [minX, minY, maxX - minX, maxY - minY];
 
             roi = obj.currentFrame(roiRect(2) : roiRect(2) + roiRect(4), roiRect(1) : roiRect(1) + roiRect(3), :);
-            newModel = histogramModel(roi, @epanechnikovProfile, obj.modelBins);
+            newModel = MeanShiftEngine.histogramModel(roi, @eMeanShiftEngine.panechnikovProfile, obj.modelBins, ...
+                obj.binIdxMapFcnHandle, obj.normalizedWeightedHistogramFcnHandle);
 
             obj.targetModel.histogram = obj.targetModel.histogram + newModel.histogram;
             

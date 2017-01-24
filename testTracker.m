@@ -23,19 +23,16 @@ rectangle('Position',roiRect);
 videoPlayer  = vision.VideoPlayer('Position',...
     [100 100 [size(currentFrame, 2), size(currentFrame, 1)]+30]);
 
-tracker = trackingModule.LucasKanadeTracker;
+%tracker = trackingModule.LucasKanadeTracker('UseMEX',true);
 
+%tracker.setParameter('MaxTrackingAffineDistortion',4);
+%tracker.setParameter('MinFeatureDistance',1);
+%tracker.setParameter('EigRetainThreshold',0.1);
+%tracker.setParameter('DestFeatures',40);
+%tracker.setParameter('UpdateThreshold',0.8);
 
-
-tracker.setParameter('MaxTrackingAffineDistortion',4);
-tracker.setParameter('MinFeatureDistance',1);
-tracker.setParameter('EigRetainThreshold',0.1);
-tracker.setParameter('DestFeatures',40);
-tracker.setParameter('UpdateThreshold',0.8);
-
-%tracker = trackingModule.CAMShiftTracker;
-%tracker.setParameter('AutoUpdate',false);
-
+tracker = trackingModule.MeanShiftTracker('UseMEX',true);
+tracker.setParameter('AutoUpdate',false);
 
 tracker.focus(currentFrame, roiRect);
 

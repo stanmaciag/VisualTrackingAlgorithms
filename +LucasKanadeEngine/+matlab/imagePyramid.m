@@ -1,4 +1,4 @@
-function pyramid = imagePyramid(image, depth)
+function [pyramid, pyramidSize] = imagePyramid(image, depth)
 
     imageSize = size(image);
     pyramid = zeros(imageSize(1), imageSize(2), depth + 1);

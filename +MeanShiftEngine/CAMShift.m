@@ -1,5 +1,5 @@
 function [currentPosition, candidateModel, orientation, dimensions] = CAMShift(currentFrame, targetModel, ...
-    previousPosition, calculationBandwidth, maxIterations, stopThreshold)
+    previousPosition, calculationBandwidth, maxIterations, stopThreshold, binIdxMapFcnHandle)
 % Object tracking using CamShift algorithm and multiple quantized feature
 % spaces - John G. Allen and Richard Y. D. Xu and Jesse S. Jin
 % Real time face and object tracking as a component of a perceptual user
@@ -28,7 +28,7 @@ function [currentPosition, candidateModel, orientation, dimensions] = CAMShift(c
     calculationRegionMaxY = min(size(currentFrame,1), previousPosition(2) + round(maxRadious * calculationBandwidth));
     
     % Compute bin index map for calculation region
-    currentFrameBinIdxMap = binIdxMap_mex(double(currentFrame(calculationRegionMinY:calculationRegionMaxY, ...
+    currentFrameBinIdxMap = binIdxMapFcnHandle(double(currentFrame(calculationRegionMinY:calculationRegionMaxY, ...
         calculationRegionMinX: calculationRegionMaxX, :)), targetModel.histogramBins, range(1), range(2));
     
     % Back-project target histogram using current bin index map (compute

@@ -1,4 +1,4 @@
-function model = histogramModel(image, windowProfileFcnHandle, histogramBins)
+function model = histogramModel(image, windowProfileFcnHandle, histogramBins, binIdxMapFcnHandle, normalizedWeightedHistogramFcnHandle)
 
     %image = double(image);
 
@@ -32,8 +32,8 @@ function model = histogramModel(image, windowProfileFcnHandle, histogramBins)
     range = getrangefromclass(image);
     
     % Compute bin index map and weighted histogram of the target ROI image
-    model.binIdxMap = binIdxMap_mex(double(image), histogramBins,  range(1), range(2));
-    model.histogram = normalizedWeightedHistogram_mex(double(image), kernel, model.binIdxMap, histogramBins);
+    model.binIdxMap = binIdxMapFcnHandle(double(image), histogramBins,  range(1), range(2));
+    model.histogram = normalizedWeightedHistogramFcnHandle(double(image), kernel, model.binIdxMap, histogramBins);
     model.histogramBins = histogramBins;
     
 end

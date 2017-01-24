@@ -1,5 +1,5 @@
 function [targetModel, backgroundModel] = ratioHistogramModel(image, targetRoi, windowProfileFcnHandle, backgroundProfileFcnHandle, ...
-    histogramBins, bandwidth, scalingFactor)
+    histogramBins, bandwidth, scalingFactor, binIdxMapFcnHandle, normalizedWeightedHistogramFcnHandle)
 
     image = double(image);
 
@@ -33,8 +33,8 @@ function [targetModel, backgroundModel] = ratioHistogramModel(image, targetRoi, 
     range = getrangefromclass(targetImage);
     
     % Compute bin index map and weighted histogram of the target ROI image
-    targetModel.binIdxMap = binIdxMap_mex(double(targetImage), histogramBins,  range(1), range(2));
-    targetModel.histogram = normalizedWeightedHistogram_mex(double(targetImage), targetKernel, targetModel.binIdxMap, histogramBins);
+    targetModel.binIdxMap = binIdxMapFcnHandle(double(targetImage), histogramBins,  range(1), range(2));
+    targetModel.histogram = normalizedWeightedHistogramFcnHandle(double(targetImage), targetKernel, targetModel.binIdxMap, histogramBins);
     targetModel.histogramBins = histogramBins;
     
     % Compute center of the target ROI (in the coordinate system of input image) 
@@ -85,8 +85,8 @@ function [targetModel, backgroundModel] = ratioHistogramModel(image, targetRoi, 
     end
     
     % Compute bin index map and weighted histogram of the backgroud ROI image
-    backgroundModel.binIdxMap = binIdxMap_mex(double(backgroundImage), histogramBins,  range(1), range(2));
-    backgroundModel.histogram = normalizedWeightedHistogram_mex(double(backgroundImage), backgroundKernel, backgroundModel.binIdxMap, histogramBins);
+    backgroundModel.binIdxMap = binIdxMapFcnHandle(double(backgroundImage), histogramBins,  range(1), range(2));
+    backgroundModel.histogram = normalizedWeightedHistogramFcnHandle(double(backgroundImage), backgroundKernel, backgroundModel.binIdxMap, histogramBins);
     backgroundModel.histogramBins = histogramBins;
     
     % Find minimal non-zero value in background's histogram

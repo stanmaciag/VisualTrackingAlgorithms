@@ -1,5 +1,6 @@
 function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, windowRadiousX, ...
-    maxEigRetainThreshold, minThresholdDistance, initialFeatures)
+    maxEigRetainThreshold, minThresholdDistance, initialFeatures, imageGradientFcnHandle, ...
+    proximityMapFcnHandle)
 %FINDGOODFEATURES Extract good features to track from given image
 % GOODFEATURES = FINDGOODFEATURES(IMAGE) 
 % References
@@ -24,7 +25,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
     windowPixelsY = windowPixelsY + initialDsplY;
     
     % Compute spatial gradients for each window
-    [gradientXWindow, gradientYWindow] = imageGradient_mex(image, windowPixelsY, windowPixelsX);
+    [gradientXWindow, gradientYWindow] = imageGradientFcnHandle(image, windowPixelsY, windowPixelsX);
     
     % Compute Hessian matrix
     gradientMomentXX = sum(sum(gradientXWindow .* gradientXWindow));
@@ -87,7 +88,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
 
     initialMap = false(size(isGoodFeature));
     
-    if (nargin > 5)
+    if (~isempty(initialFeatures))
         
         initialFeatures = initialFeatures(initialFeatures(:,1) >= windowRadiousX + 2 & ...
                 initialFeatures(:,2) >= windowRadiousY + 2 & initialFeatures(:,1) <= size(image,2) - windowRadiousX - 1 & ...
@@ -103,7 +104,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
     isGoodFeature = isGoodFeature & ~initialMap;
     
     % Compute proximity map
-    map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
+    map = proximityMapFcnHandle(isGoodFeature | initialMap, minThresholdDistance);
     featureProximity = map(isGoodFeature);
     maximumProxmitiy = max(featureProximity);
     
@@ -115,7 +116,7 @@ function [goodFeatures, minEigenvals] = findGoodFeatures(image, windowRadiousY, 
         isGoodFeature(goodFeaturesIdx(maxIdx)) = false;
         
         % Compute proximity map
-        map = proximityMap_mex(isGoodFeature | initialMap, minThresholdDistance);
+        map = proximityMapFcnHandle(isGoodFeature | initialMap, minThresholdDistance);
         goodFeaturesIdx = find(isGoodFeature);
         featureProximity = map(goodFeaturesIdx);
         maximumProxmitiy = max(featureProximity);

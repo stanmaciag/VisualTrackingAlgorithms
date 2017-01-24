@@ -18,6 +18,7 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
         defaultDestFeatures = 100;
         defaultUpdateThreshold = 0.8;
         defaultAutoUpdate = true;
+        defaultUseMEX = true;
 
     end
 
@@ -59,6 +60,7 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
         % Automatic update flag (if true update will be performed when
         % features ratio reaches threshold level)
         autoUpdate;
+        useMEX;
         
         % Current and previous frame passed to tracker
         currentFrame;
@@ -70,6 +72,14 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
         featuresEigenvals;
         % Bounding polygon of tracked object
         boundingPolygon;
+        
+        %Function handles (for functions that are implemented both as
+        %Matlab native and MEX
+        bilinearInterpolateFcnHandle;
+        imageGradientFcnHandle;
+        imagePyramidFcnHandle;
+        interpolatedGradientFcnHandle;
+        proximityMapFcnHandle;
 
     end
     
@@ -93,6 +103,80 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             
             obj.previousFrame = obj.currentFrame;
             obj.currentFrame = newFrame;
+            
+        end
+        
+        function obj = setFcnHandles(obj)
+            
+           
+            if obj.useMEX
+            
+                % Check if compiled MEX functions are present, set function handles
+                % properly
+                if isempty(dir('+LucasKanadeEngine/+mex/bilinearInterpolate.mex*'))
+
+                    obj.bilinearInterpolateFcnHandle = @LucasKanadeEngine.matlab.bilinearInterpolate;
+                    warning('LucasKanadeEngine:fileNotFound', 'MEX function bilinearInterpolate not found, using native version');
+
+                else
+
+                    obj.bilinearInterpolateFcnHandle = @LucasKanadeEngine.mex.bilinearInterpolate;
+
+                end
+
+                if isempty(dir('+LucasKanadeEngine/+mex/imageGradient.mex*'))
+
+                    obj.imageGradientFcnHandle = @LucasKanadeEngine.matlab.imageGradient;
+                    warning('LucasKanadeEngine:fileNotFound', 'MEX function imageGradient not found, using native version');
+
+                else
+
+                    obj.imageGradientFcnHandle = @LucasKanadeEngine.mex.imageGradient;
+
+                end
+                
+                if isempty(dir('+LucasKanadeEngine/+mex/imagePyramid.mex*'))
+
+                    obj.imagePyramidFcnHandle = @LucasKanadeEngine.matlab.imagePyramid;
+                    warning('LucasKanadeEngine:fileNotFound', 'MEX function imagePyramid not found, using native version');
+
+                else
+
+                    obj.imagePyramidFcnHandle = @LucasKanadeEngine.mex.imagePyramid;
+
+                end
+                
+                if isempty(dir('+LucasKanadeEngine/+mex/interpolatedGradient.mex*'))
+
+                    obj.interpolatedGradientFcnHandle = @LucasKanadeEngine.matlab.interpolatedGradient;
+                    warning('LucasKanadeEngine:fileNotFound', 'MEX function interpolatedGradient not found, using native version');
+
+                else
+
+                    obj.interpolatedGradientFcnHandle = @LucasKanadeEngine.mex.interpolatedGradient;
+
+                end
+                
+                if isempty(dir('+LucasKanadeEngine/+mex/proximityMap.mex*'))
+
+                    obj.proximityMapFcnHandle = @LucasKanadeEngine.matlab.proximityMap;
+                    warning('LucasKanadeEngine:fileNotFound', 'MEX function proximityMap not found, using native version');
+
+                else
+
+                    obj.proximityMapFcnHandle = @LucasKanadeEngine.mex.proximityMap;
+
+                end
+            
+            else
+                
+                obj.bilinearInterpolateFcnHandle = @LucasKanadeEngine.matlab.bilinearInterpolate;
+                obj.imageGradientFcnHandle = @LucasKanadeEngine.matlab.imageGradient;  
+                obj.imagePyramidFcnHandle = @LucasKanadeEngine.matlab.imagePyramid;
+                obj.interpolatedGradientFcnHandle = @LucasKanadeEngine.matlab.interpolatedGradient;
+                obj.proximityMapFcnHandle = @LucasKanadeEngine.matlab.proximityMap;
+                
+            end
             
         end
         
@@ -142,6 +226,8 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
                 'Model update threshold must be positive numeric less or equal to 1'));
             addParameter(parameterParser, 'AutoUpdate', obj.autoUpdate, @(x) assert(islogical(x), ...
                 'Model auto-update flag must be logical value'));
+            addParameter(parameterParser, 'UseMEX', obj.useMEX, @(x) assert(islogical(x), ...
+                'MEX functions usage flag must be logical value'));
                         
             % Parse given parameters
             parse(parameterParser, varargin{:});
@@ -162,6 +248,14 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             obj.maxTrackingAffineDistortion = parameterParser.Results.MaxTrackingAffineDistortion;
             obj.updateThreshold = parameterParser.Results.UpdateThreshold;
             obj.autoUpdate = parameterParser.Results.AutoUpdate;
+            obj.useMEX = obj.defaultUseMEX;
+            
+            if obj.useMEX ~= parameterParser.Results.UseMEX
+               
+                obj.useMEX = parameterParser.Results.UseMEX;
+                obj.setFcnHandles;
+                
+            end
             
         end
        
@@ -192,6 +286,8 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             
             % Modify parameters
             setParameter(obj, varargin{:});
+            
+            obj.setFcnHandles;
 
         end
         
@@ -220,8 +316,9 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             % Extract ROI from current frame
             roi = obj.currentFrame(roiRect(2):roiRect(2) + roiRect(4), roiRect(1):roiRect(1) + roiRect(3));
             % Find good features to track in selected ROI
-            [obj.targetFeatures, obj.featuresEigenvals] = findGoodFeatures(roi, obj.extractWindowRadiousY, ...
-                obj.extractWindowRadiousY, obj.eigRetainThreshold, obj.minFeatureDistance);
+            [obj.targetFeatures, obj.featuresEigenvals] = LucasKanadeEngine.findGoodFeatures(roi, obj.extractWindowRadiousY, ...
+                obj.extractWindowRadiousY, obj.eigRetainThreshold, obj.minFeatureDistance, [], obj.imageGradientFcnHandle, ...
+                obj.proximityMapFcnHandle);
             
             % If found features quantity is greater than destined features
             % quantity select the strongest (with the greates minimal
@@ -288,10 +385,11 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             obj.pushFrame(frame);
             
             % Estimate optical flow of tracked features
-            [flow, trackingSuccessful] = pyramidalLucasKanade(obj.previousFrame, obj.currentFrame, ...
+            [flow, trackingSuccessful] = LucasKanadeEngine.pyramidalLucasKanade(obj.previousFrame, obj.currentFrame, ...
                 obj.targetFeatures, obj.trackWindowRadiousY, obj.trackWindowRadiousX, ...
                 obj.maxIterations, obj.stopThreshold, obj.pyramidDepth, obj.minHessianDet, ...
-                @inverseCompostionalLK, @gaussianKernel);
+                @LucasKanadeEngine.inverseCompostionalLK, @LucasKanadeEngine.gaussianKernel, obj.imagePyramidFcnHandle, obj.interpolatedGradientFcnHandle, ... 
+                obj.bilinearInterpolateFcnHandle);
 
             
             % Retain only successfully tracked features (not degenerated
@@ -315,8 +413,8 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             obj.targetFeatures = obj.targetFeatures + flow;
             
             % Compute affine transformation matrix between current and previous features 
-            [affineMatrix, inlinersIdx, distance]  = fitHomography(previousFeatures, obj.targetFeatures, ...
-                obj.maxTrackingAffineDistortion, @computeAffine);
+            [affineMatrix, inlinersIdx, distance]  = LucasKanadeEngine.fitHomography(previousFeatures, obj.targetFeatures, ...
+                obj.maxTrackingAffineDistortion, @LucasKanadeEngine.computeAffine);
  
             % Fail if quantity of current features that are fitting stated
             % affine transformation is less than minimal
@@ -341,7 +439,7 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
                 / size(obj.targetFeatures,1))) * size(obj.targetFeatures,1) / obj.destFeatures;
             
             % Transform bounding polygon
-            obj.boundingPolygon = applyHomography(obj.boundingPolygon, affineMatrix);
+            obj.boundingPolygon = LucasKanadeEngine.applyHomography(obj.boundingPolygon, affineMatrix);
             
             % Retain features that lie inside bounding polygon (make
             % sure that they belong to tracked object)
@@ -360,7 +458,7 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             end
             
             % Transform current position
-            obj.position = applyHomography(obj.position, affineMatrix);
+            obj.position = LucasKanadeEngine.applyHomography(obj.position, affineMatrix);
             
             % Decompose affine matrix
             [U,D,V] = svd(affineMatrix(1:2,1:2));
@@ -438,8 +536,9 @@ classdef LucasKanadeTracker < trackingModule.VisualTracker
             
             % Find good features in ROI, that additionally fulfill
             % minimal proximity constraints with currently tracked features
-            [newFeatures, newEigenvals] = findGoodFeatures(roi, obj.extractWindowRadiousY, ...
-                obj.extractWindowRadiousY, obj.eigRetainThreshold, obj.minFeatureDistance, initialFeatures);
+            [newFeatures, newEigenvals] = LucasKanadeEngine.findGoodFeatures(roi, obj.extractWindowRadiousY, ...
+                obj.extractWindowRadiousY, obj.eigRetainThreshold, obj.minFeatureDistance, initialFeatures, ...
+                obj.imageGradientFcnHandle, obj.proximityMapFcnHandle);
             
             % If any new features found
             if size(newFeatures(:,1)) > 0

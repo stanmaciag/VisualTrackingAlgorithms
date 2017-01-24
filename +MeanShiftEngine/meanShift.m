@@ -1,5 +1,6 @@
 function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentFrame, previousPosition, ...
-    targetModel, windowBandwidth, windowProfileFcnHandle, windowDProfileFcnHandle, maxIterations, stopThreshold)
+    targetModel, windowBandwidth, windowProfileFcnHandle, windowDProfileFcnHandle, maxIterations, stopThreshold, ...
+    binIdxMapFcnHandle, normalizedWeightedHistogramFcnHandle, pixelWeightsFcnHandle)
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Kernel-based object tracking
 % Dorin Comaniciu and Visvanathan Ramesh and Peter Meer - Real-time tracking of non-rigid objects using mean shift
 % TODO Sprawdzić izotropowość
@@ -56,11 +57,11 @@ function [currentPosition, similarityCoeff, candidateModel] = meanShift(currentF
             double(currentFrame(roiMinY + roiMinYPad : roiMaxY - roiMaxYPad, roiMinX + roiMinXPad : roiMaxX - roiMaxXPad,:));
         
         % Compute bin index map and weighted normalized histogram of the target ROI image
-        candidateIdxMap = binIdxMap_mex(roi, targetModel.histogramBins,  range(1), range(2));
-        candidateHistogram = normalizedWeightedHistogram_mex(roi, kernel, candidateIdxMap, targetModel.histogramBins);
+        candidateIdxMap = binIdxMapFcnHandle(roi, targetModel.histogramBins,  range(1), range(2));
+        candidateHistogram = normalizedWeightedHistogramFcnHandle(roi, kernel, candidateIdxMap, targetModel.histogramBins);
         
         % Compute pixel weights
-        weightsMap = pixelWeights_mex(targetModel.histogram, candidateHistogram, kernel, candidateIdxMap);
+        weightsMap = pixelWeightsFcnHandle(targetModel.histogram, candidateHistogram, kernel, candidateIdxMap);
         
         % Calculate sum of weights
         weightsMapSum = sum(sum(weightsMap.*-kernelDerivative));

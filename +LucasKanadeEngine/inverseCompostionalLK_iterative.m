@@ -1,6 +1,6 @@
 function opticalFlow = inverseCompostionalLK_iterative(previousFrame, currentFrame, ...
     pointsToTrack, windowRadiousY, windowRadiousX, maxIterations, ...
-    stopThreshold, weightingKernel, initialOpticalFlow)
+    stopThreshold, weightingKernel, initialOpticalFlow, interpolatedGradientFcnHandle, bilinearInterpolateFcnHandle)
     % References
     % ----------
     % 1. Baker, S. & Matthews, I. Lucas-Kanade 20 Years On: A Unifying 
@@ -27,11 +27,11 @@ function opticalFlow = inverseCompostionalLK_iterative(previousFrame, currentFra
         [windowPixelsX, windowPixelsY] = meshgrid(windowXRangeMin : windowXRangeMax, windowYRangeMin : windowYRangeMax); 
         
         % Get spatial gradient for current window
-        gradientYWindow = bilinearInterpolate_mex(gradientY, windowPixelsY, windowPixelsX);
-        gradientXWindow = bilinearInterpolate_mex(gradientX, windowPixelsY, windowPixelsX);
+        gradientYWindow = bilinearInterpolateFcnHandle(gradientY, windowPixelsY, windowPixelsX);
+        gradientXWindow = bilinearInterpolateFcnHandle(gradientX, windowPixelsY, windowPixelsX);
         
         % Get template for current window
-        templateWindow = bilinearInterpolate_mex(previousFrame, windowPixelsY, windowPixelsX);
+        templateWindow = bilinearInterpolateFcnHandle(previousFrame, windowPixelsY, windowPixelsX);
         
         % Compute Hessian matrix
         gradientMomentXX = sum(sum(gradientXWindow .* gradientXWindow .* weightingKernel));
@@ -43,7 +43,7 @@ function opticalFlow = inverseCompostionalLK_iterative(previousFrame, currentFra
         for i = 1:maxIterations
 
             % Warp current frame window with last opitcal flow estimation
-            windowWarped = bilinearInterpolate_mex(currentFrame, ...
+            windowWarped = bilinearInterpolateFcnHandle(currentFrame, ...
                    windowPixelsY + currentFlow(2) + initialOpticalFlow(currentPointIdx, 2), ...
                    windowPixelsX + currentFlow(1) + initialOpticalFlow(currentPointIdx, 1));
 

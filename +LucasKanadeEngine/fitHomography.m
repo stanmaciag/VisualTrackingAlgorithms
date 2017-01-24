@@ -11,7 +11,7 @@ function [homographyMatrix, bestInlinerIdx, distance] = fitHomography(previousPo
         idx = randperm(size(previousPoints,1), 4);
         currentHomographyMatrix = homographyComputerFcnHandle(previousPoints(idx,:), currentPoints(idx,:));
 
-        transformedPoints = applyHomography(previousPoints,currentHomographyMatrix);
+        transformedPoints = LucasKanadeEngine.applyHomography(previousPoints,currentHomographyMatrix);
         %inverseTransformedPoints = applyHomography(currentPoints, inv(currentHomographyMatrix));
 
         %currentDistance = sqrt((transformedPoints(:,1) - currentPoints(:,1)).^2 + (transformedPoints(:,2) - currentPoints(:,2)).^2) + ...

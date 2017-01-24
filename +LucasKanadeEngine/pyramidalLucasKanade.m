@@ -1,6 +1,7 @@
 function [opticalFlow, trackingSuccessful] = pyramidalLucasKanade(previousFrame, currentFrame, ...
     pointsToTrack, windowRadiousY, windowRadiousX, maxIterations, ...
-    stopThreshold, pyramidDepth, minHessianDet, engileFcnHandle, weightingKernelFcnHandle)
+    stopThreshold, pyramidDepth, minHessianDet, engileFcnHandle, weightingKernelFcnHandle, ...
+    imagePyramidFcnHandle, interpolatedGradientFcnHandle, bilinearInterpolateFcnHandle)
     %PYRAMIDALLUCASKANADE Summary of this function goes here
     %   Detailed explanation goes here
     % References
@@ -25,8 +26,8 @@ function [opticalFlow, trackingSuccessful] = pyramidalLucasKanade(previousFrame,
     % Compute image pyramids for current and previous frame
     previousFrame = previousFrame(roiMinY:roiMaxY, roiMinX:roiMaxX);
     currentFrame = currentFrame(roiMinY:roiMaxY, roiMinX:roiMaxX);
-    [previousPyramid, levelSize] = imagePyramid_mex(previousFrame, pyramidDepth);
-    currentPyramid = imagePyramid_mex(currentFrame, pyramidDepth);
+    [previousPyramid, levelSize] = imagePyramidFcnHandle(previousFrame, pyramidDepth);
+    currentPyramid = imagePyramidFcnHandle(currentFrame, pyramidDepth);
    
     % Initialize pyramid optical flow guess and current level guess optical flow 
     pyramidGuessOpticalFlow = zeros([size(pointsToTrack), pyramidDepth + 1]);
@@ -44,10 +45,11 @@ function [opticalFlow, trackingSuccessful] = pyramidalLucasKanade(previousFrame,
         levelPointsToTrack = pointsToTrack ./ (2 ^ (L - 1));
         
         % Estimate optical flow for current level
-        [currentLevelOpticalFlow, currentTrackingSuccessful] = lucasKanadeAlgorithm(previousPyramidCurrentLevel, ...
+        [currentLevelOpticalFlow, currentTrackingSuccessful] = LucasKanadeEngine.lucasKanadeAlgorithm(previousPyramidCurrentLevel, ...
             currentPyramidCurrentLevel, levelPointsToTrack(trackingSuccessful, :), windowRadiousY, ...
             windowRadiousX, maxIterations, stopThreshold, minHessianDet, weightingKernelFcnHandle, ...
-            engileFcnHandle, pyramidGuessOpticalFlow(trackingSuccessful, :, L));
+            engileFcnHandle, pyramidGuessOpticalFlow(trackingSuccessful, :, L), interpolatedGradientFcnHandle, ...
+            bilinearInterpolateFcnHandle);
         
         trackingSuccessful(trackingSuccessful) = trackingSuccessful(trackingSuccessful) & currentTrackingSuccessful;
         levelOpticalFlow(trackingSuccessful, :, L) = currentLevelOpticalFlow(currentTrackingSuccessful, :);
