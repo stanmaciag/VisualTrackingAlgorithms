@@ -3,7 +3,7 @@
 This repository contains algorithms and tracking engines developed as part of my master thesis - Automatic module for tracking of moving object in mobile robotics.
 
 Performance-critical functions were implemented both as Matlab naitive functions and C mex functions. Under Linux systems mex files can be compiled easily from the level of
-Matlab console, using `system('make')`.
+Matlab console, using `system('make')`. You may need to modify makefile and change the path to the GCC compiler (if it is different from the default). Note that MEX compiler currently supports only the version 4.7 (not newer), so make sure that you have it installed.
 
 ## List of Matlab functions and modules
 
