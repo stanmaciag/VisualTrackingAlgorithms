@@ -2,8 +2,6 @@
 
 This repository contains algorithms and tracking engines developed as part of my master thesis - Automatic module for tracking of moving object in mobile robotics.
 
-None of the functions require any Matlab's toolboxes (besides test scripts, which depend on Computer Vision toolbox for easy video reading, caputring and playing).
-
 Performance-critical functions were implemented both as Matlab naitive functions and C mex functions. Under Linux systems mex files can be compiled easily from the level of
 Matlab console, using `system('make')`.
 
