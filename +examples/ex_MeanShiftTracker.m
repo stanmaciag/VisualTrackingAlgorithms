@@ -1,4 +1,20 @@
-% This script depends on the computer vision system toolbox
+%% MeanShift tracker example
+% This script demonstrates the MeanShift tracker. For this purpose it
+% uses built-in video from the Computer Vision Toolbox, that is also being
+% used for testing Matlab's implementation of the CAMShift tracker (see 
+% https://www.mathworks.com/help/vision/examples/face-detection-and-tracking-using-camshift.html
+% for more details).
+% After initialization the first frame of the video is shown and the
+% script awaits selection of the ROI (defined as boudning rectangle).
+% Afterwads, all the available tracker parameters are tuned and the ROI is 
+% being tracked until the end of the video sequence. Finally, timing stats
+% are displayed. 
+% 
+% Run this script from the root level of the repositiory.
+%
+% External requirements:
+% - Computer Vision Toolbox
+% - Image Processing Toolbox
 
 %% Clear workspace and initialize the variables
 
@@ -13,12 +29,9 @@ averageTimeAcc = 0;
 
 %% Load the video, initialize player
 
-% This script is using built-in video from the computer vision toolbox, which 
-% is also used for testing Matlab's implementation of the CAMShift tracker
-% (available at
-% https://www.mathworks.com/help/vision/examples/face-detection-and-tracking-using-camshift.html)
+% Use built-in video by default
 videoFileReader = vision.VideoFileReader('visionface.avi');
-currentFrame = step(videoFileReader);
+currentFrame = videoFileReader.step;
 
 videoPlayer  = vision.VideoPlayer('Position',...
     [100 100 [size(currentFrame, 2), size(currentFrame, 1)] + 30]);
@@ -69,13 +82,13 @@ tracker.setParameter('BackgroundCancel', false);
 tracker.focus(currentFrame, roiRect);
 
 %% Track object in the ROI (if previous try successful)
-while ~isDone(videoFileReader) && tracker.getStatus
+while ~videoFileReader.isDone && tracker.getStatus
    
     % Increment the frames count
     framesCount = framesCount + 1;
     
     % Get the next frame from the sequence
-    currentFrame = step(videoFileReader);
+    currentFrame = videoFileReader.step;
     
     % Start time measurement
     tic;
@@ -128,7 +141,7 @@ while ~isDone(videoFileReader) && tracker.getStatus
     currentFrame = insertText(currentFrame, [10, 30], [num2str(tracker.getSimilarity * 100), '%']); 
     
     % Show the current frame
-    step(videoPlayer, currentFrame);
+    videoPlayer.step(currentFrame);
     
 end
 
